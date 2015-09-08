@@ -1,5 +1,8 @@
 #include "app_board.h"
 
+uint16_t                         m_conn_handle = BLE_CONN_HANDLE_INVALID;    /**< Handle of the current connection. */
+ble_nus_t                        m_nus;                                      /**< Structure to identify the Nordic UART Service. */
+
 
 /*timers init*/
 static void timers_init(void)

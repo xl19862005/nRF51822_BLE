@@ -466,6 +466,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\app\app_io.c</FilePath>
             </File>
+            <File>
+              <FileName>app_ble.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\app\app_ble.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -965,6 +970,11 @@
               <FileName>app_io.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\app\app_io.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_ble.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\app\app_ble.c</FilePath>
             </File>
           </Files>
         </Group>

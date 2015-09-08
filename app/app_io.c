@@ -1,5 +1,7 @@
 #include "app_io.h"
-#include "app_board.h"
+
+extern uint16_t                         m_conn_handle;
+extern ble_nus_t                        m_nus; 
 
 /**@brief Function for handling events from the BSP module.
  *
@@ -40,7 +42,7 @@ static void bsp_event_handler(bsp_event_t event)
  *
  * @param[out] p_erase_bonds  Will be true if the clear bonding button was pressed to wake the application up.
  */
-void buttons_leds_init(bool * p_erase_bonds)
+void app_io_init(bool * p_erase_bonds)
 {
     bsp_event_t startup_event;
 
