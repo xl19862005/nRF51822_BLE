@@ -62,12 +62,12 @@ int main(void)
     
     // Initialize.
 	app_board_init();
-    app_io_init(&erase_bonds);
+    app_io_init(&erase_bonds); 
 
 	//ble stack,gap,service ect. initialize
 	app_ble_init();
 	    
-    printf("%s",start_string);
+    LOG_INFO("%s",start_string);
 
     err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
     APP_ERROR_CHECK(err_code);

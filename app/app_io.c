@@ -32,6 +32,19 @@ static void bsp_event_handler(bsp_event_t event)
             }
             break;
 
+//Xandy add for key event
+		case BSP_EVENT_KEY_0:
+				LOG_INFO("key 0 press");
+			break;
+
+		case BSP_EVENT_KEY_1:
+			LOG_INFO("key 1 press");
+			break;
+
+		case BSP_EVENT_KEY_2:
+			LOG_INFO("key 2 press");
+			break;
+
         default:
             break;
     }
