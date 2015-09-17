@@ -34,7 +34,7 @@
 #define BUTTONS_NUMBER 3
 #define LEDS_NUMBER    2
 #define BUTTONS_MASK   ((1 << BUTTON_0)| (1 << BUTTON_1) | (1 << BUTTON_2))
-#define LEDS_MASK      0x000C0000
+#define LEDS_MASK      ((1 << LED_0) | (1 << LED_1))
 #define LEDS_INV_MASK  0
 
 #define BSP_BUTTON_0_MASK (1<<BSP_BUTTON_0)
