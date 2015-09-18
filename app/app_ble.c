@@ -98,14 +98,27 @@ static void ble_stack_init(void)
 static void gap_params_init(void)
 {
     uint32_t                err_code;
+	int i; 
+	char device_name[50],tmp[2];
     ble_gap_conn_params_t   gap_conn_params;
     ble_gap_conn_sec_mode_t sec_mode;
+	ble_gap_addr_t gap_addr;
 
     BLE_GAP_CONN_SEC_MODE_SET_OPEN(&sec_mode);
+
+	err_code = sd_ble_gap_address_get(&gap_addr);
+    APP_ERROR_CHECK(err_code);
+
+	sprintf(device_name,"%s",DEVICE_NAME);
+	for(i=BLE_GAP_ADDR_LEN-1;i>=0;i--)
+	{
+		sprintf(tmp,"-%2x",gap_addr.addr[i]);
+		strcat(device_name,tmp);
+	}
     
     err_code = sd_ble_gap_device_name_set(&sec_mode,
-                                          (const uint8_t *) DEVICE_NAME,
-                                          strlen(DEVICE_NAME));
+                                          (const uint8_t *) device_name,
+                                          strlen(device_name));
     APP_ERROR_CHECK(err_code);
 
     memset(&gap_conn_params, 0, sizeof(gap_conn_params));
