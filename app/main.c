@@ -23,8 +23,6 @@
 
 #include "app_board.h"
 
-#define START_STRING                    "Starting...\n"                                /**< The string that will be sent over the UART when the application starts. */
-
 #define DEAD_BEEF                       0xDEADBEEF                                  /**< Value used as error code on stack dump, can be used to identify stack location on stack unwind. */
 
 /**@brief Function for assert macro callback.
@@ -56,9 +54,7 @@ static void power_manage(void)
  */
 int main(void)
 {
-    uint32_t err_code;
     bool erase_bonds;
-    uint8_t  start_string[] = START_STRING;
     
     // Initialize.
 	app_board_init();
@@ -67,15 +63,13 @@ int main(void)
 	//ble stack,gap,service ect. initialize
 	app_ble_init();
 	    
-    LOG_INFO("%s",start_string);
-
-    err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
-    APP_ERROR_CHECK(err_code);
+    LOG_INFO("Starting...");
     
     // Enter main loop.
     for (;;)
     {
         power_manage();
+		app_uart_evt_dispatch();
     }
 }
 

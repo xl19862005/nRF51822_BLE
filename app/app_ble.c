@@ -109,6 +109,7 @@ static void gap_params_init(void)
 	err_code = sd_ble_gap_address_get(&gap_addr);
     APP_ERROR_CHECK(err_code);
 
+	//Xandy@ add mac address to device name
 	sprintf(device_name,"%s",DEVICE_NAME);
 	for(i=BLE_GAP_ADDR_LEN-1;i>=0;i--)
 	{
@@ -294,9 +295,14 @@ static void advertising_init(void)
 
 void app_ble_init(void)
 {
+    uint32_t      err_code;
+
 	ble_stack_init();
 	gap_params_init();
 	services_init();
     advertising_init();
     conn_params_init();
+
+	err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
+	APP_ERROR_CHECK(err_code);
 }

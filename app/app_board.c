@@ -3,6 +3,7 @@
 uint16_t                         m_conn_handle = BLE_CONN_HANDLE_INVALID;    /**< Handle of the current connection. */
 ble_nus_t                        m_nus;                                      /**< Structure to identify the Nordic UART Service. */
 
+extern app_ring_buffer_t uart_rx;
 
 /*timers init*/
 static void timers_init(void)
@@ -20,27 +21,24 @@ static void timers_init(void)
 /**@snippet [Handling the data received over UART] */
 void uart_event_handle(app_uart_evt_t * p_event)
 {
-    static uint8_t data_array[BLE_NUS_MAX_DATA_LEN];
-    static uint8_t index = 0;
     uint32_t       err_code;
 
     switch (p_event->evt_type)
     {
-        case APP_UART_DATA_READY:
-            UNUSED_VARIABLE(app_uart_get(&data_array[index]));
-            index++;
+		case APP_UART_DATA_READY:
+			UNUSED_VARIABLE(app_uart_get(&uart_rx.buffer[uart_rx.iput++]));
 
-            if ((data_array[index - 1] == '\n') || (index >= (BLE_NUS_MAX_DATA_LEN)))
-            {
-                err_code = ble_nus_string_send(&m_nus, data_array, index);
-                if (err_code != NRF_ERROR_INVALID_STATE)
-                {
-                    APP_ERROR_CHECK(err_code);
-                }
-                
-                index = 0;
-            }
-            break;
+			if ((uart_rx.buffer[uart_rx.iput-1] == '\n') || (uart_rx.iput >= (MAX_RING_BUFFER_SIZE)))
+			{
+				err_code = ble_nus_string_send(&m_nus, uart_rx.buffer, uart_rx.iput);
+				if (err_code != NRF_ERROR_INVALID_STATE)
+				{
+					APP_ERROR_CHECK(err_code);
+				}
+				
+				uart_rx.iput = 0;
+			}
+			break;
 
         case APP_UART_COMMUNICATION_ERROR:
             APP_ERROR_HANDLER(p_event->data.error_communication);

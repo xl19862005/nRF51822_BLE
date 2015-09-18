@@ -471,6 +471,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\app\app_ble.c</FilePath>
             </File>
+            <File>
+              <FileName>app_uart_rtx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\app\app_uart_rtx.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -975,6 +980,11 @@
               <FileName>app_ble.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\app\app_ble.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_uart_rtx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\app\app_uart_rtx.c</FilePath>
             </File>
           </Files>
         </Group>
