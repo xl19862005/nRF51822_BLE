@@ -1,5 +1,6 @@
 #ifndef _APP_DEVICE_CODE_H
 #define _APP_DEVICE_CODE_H
+
 //all fun. and devices defines 
 typedef enum{
 	BLE_WATCH_LOCK_STATUS = 0x01,
@@ -11,12 +12,6 @@ typedef enum{
 	BLE_PROXIMITY,
 	BLE_ACCEL
 }ble_device_t;
-
-//ble lock watch codes
-typedef enum{
-	BLE_WATCH_UNLOCK = 0x00,
-	BLE_WATCH_LOCKED
-}ble_lock_watch_status_t;
 
 //ble local position codes
 typedef enum{

@@ -8,12 +8,12 @@ static bool is_cmd_head(const uint8_t* pdata)
 }
 
 
-static uint16_t crc16_check(const uint8_t *data_ptr, uint8_t data_length)
+static uint16_t crc16_check(const uint8_t *data_ptr, uint16_t data_length)
 {
 	/*polynomial*/
 	uint16_t crc_gen = 0x1021;
 	uint16_t crc;
-	uint8_t i, j;
+	uint16_t i, j;
 
 	/*init value of crc*/
 	crc = 0xFFFF;
@@ -48,7 +48,7 @@ static void device_cmd_dispatch(const uint8_t* pdata)
 	switch(device)
 	{
 		case BLE_WATCH_LOCK_STATUS:
-
+			watch_lock_status_process(pdata, len);
 		break;
 
 		case BLE_POSITION_STATUS:

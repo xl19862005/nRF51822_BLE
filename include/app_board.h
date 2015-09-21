@@ -22,6 +22,7 @@
 #include "debug.h"
 #include "app_uart_rtx.h"
 #include "app_device_code.h"
+#include "app_watch_lock.h"
 
 #define APP_TIMER_PRESCALER             0                                           /**< Value of the RTC1 PRESCALER register. */
 #define APP_TIMER_MAX_TIMERS            (2 + BSP_APP_TIMERS_NUMBER)                 /**< Maximum number of simultaneously created timers. */
