@@ -3,7 +3,7 @@
 uint16_t                         m_conn_handle = BLE_CONN_HANDLE_INVALID;    /**< Handle of the current connection. */
 ble_nus_t                        m_nus;                                      /**< Structure to identify the Nordic UART Service. */
 
-extern app_ring_buffer_t uart_rx;
+extern app_uart_buffer_t uart_rx;
 
 /*timers init*/
 static void timers_init(void)
@@ -28,6 +28,7 @@ void uart_event_handle(app_uart_evt_t * p_event)
 		case APP_UART_DATA_READY:
 			UNUSED_VARIABLE(app_uart_get(&uart_rx.buffer[uart_rx.iput++]));
 
+			//send uart message to BLE
 			if ((uart_rx.buffer[uart_rx.iput-1] == '\n') || (uart_rx.iput >= (MAX_RING_BUFFER_SIZE)))
 			{
 				err_code = ble_nus_string_send(&m_nus, uart_rx.buffer, uart_rx.iput);
@@ -36,7 +37,14 @@ void uart_event_handle(app_uart_evt_t * p_event)
 					APP_ERROR_CHECK(err_code);
 				}
 				
+				//uart_rx.iput = 0;
+			}
+
+			if(uart_rx.iput >= MAX_RING_BUFFER_SIZE)
+			{
 				uart_rx.iput = 0;
+				uart_rx.iget = 0;
+				LOG_DEBUG("receive cmd lengther then 512 bytes!");
 			}
 			break;
 

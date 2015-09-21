@@ -68,7 +68,7 @@ int main(void)
     // Enter main loop.
     for (;;)
     {
-        power_manage();
+		power_manage();
 		app_uart_evt_dispatch();
     }
 }

@@ -8,14 +8,15 @@
 //ring buffer max size
 #define MAX_RING_BUFFER_SIZE	 512
 //a package for cmd head
-#define CMD_HEAD	0xF5
+#define CMD_HEAD0		0x5A
+#define CMD_HEAD1		0xA5
 
 
 typedef struct{
 	uint32_t iput;
 	uint32_t iget;
 	uint8_t buffer[MAX_RING_BUFFER_SIZE];
-}app_ring_buffer_t;
+}app_uart_buffer_t;
 
 void app_uart_evt_dispatch(void);
 #endif
