@@ -476,6 +476,46 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\app\app_uart_rtx.c</FilePath>
             </File>
+            <File>
+              <FileName>app_accel.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\app\app_accel.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_bond_act.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\app\app_bond_act.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_finder.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\app\app_finder.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_link_check.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\app\app_link_check.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_photo_key.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\app\app_photo_key.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_position.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\app\app_position.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_proximity.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\app\app_proximity.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_watch_lock.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\app\app_watch_lock.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -985,6 +1025,46 @@
               <FileName>app_uart_rtx.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\app\app_uart_rtx.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_accel.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\app\app_accel.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_bond_act.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\app\app_bond_act.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_finder.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\app\app_finder.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_link_check.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\app\app_link_check.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_photo_key.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\app\app_photo_key.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_position.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\app\app_position.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_proximity.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\app\app_proximity.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_watch_lock.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\app\app_watch_lock.c</FilePath>
             </File>
           </Files>
         </Group>
