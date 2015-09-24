@@ -13,12 +13,6 @@ typedef enum{
 	BLE_ACCEL
 }ble_device_t;
 
-//ble local position codes
-typedef enum{
-	BLE_POSITION_DISABLE = 0x00,
-	BLE_POSITION_ENABLE	
-}ble_position_status_t;
-
 //ble photo key codes
 typedef enum{
 	BLE_PHOTO_KEY_DISABLE = 0x00,

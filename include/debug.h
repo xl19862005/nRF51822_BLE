@@ -5,10 +5,9 @@
 /*****************************************************************************
 * Logging and printing to UART
 *****************************************************************************/
-
 /**@brief Disable logging to UART by commenting out this line.*/
-#define USE_UART_LOG_INFO   /* Enable to print standard output to UART. */
-#define USE_UART_LOG_DEBUG  /* Enable to print standard output to UART. */
+//#define USE_UART_LOG_INFO   /* Enable to print standard output to UART. */
+//#define USE_UART_LOG_DEBUG  /* Enable to print standard output to UART. */
 
 /**@brief Macro defined to output log data on the UART or not as user information __PRINT or debug __LOG,
                     based on the USE_UART_LOGGING and USE_UART_PRINTING flag. 

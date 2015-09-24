@@ -8,5 +8,5 @@ typedef enum{
 	BLE_WATCH_LOCKED
 }ble_lock_watch_status_t;
 
-void watch_lock_status_process(const uint8_t* pdata, int len);
+void watch_lock_status_process(int len);
 #endif

@@ -6,6 +6,23 @@
 
 #define NUS_SERVICE_UUID_TYPE           BLE_UUID_TYPE_VENDOR_BEGIN                  /**< UUID type for the Nordic UART Service (vendor specific). */
 
+//owner service 
+#define SERVICE_UUID128                         0x1b, 0xc5, 0xd5, 0xa5, 0x02, 0x00, 0xbe, 0xa1, 0xe3, 0x11, 0x6b, 0xed, 0x40, 0xfe, 0x0b, 0x31 /* UUID 128: 310bfe40-ed6b-11e3-a1be-0002a5d5c51b */
+#define SERVICE_CHARACTERISTIC_UUID             0x9001
+#define SERVICE_CHARACTERISTIC_VALUE            {0,0,0}
+#define SERVICE_CHARACTERISTIC_DESCRIPTOR_UUID  0x9002
+
+//action service
+#define ACTION_SERVECE_UUID				0xAA01
+#define RANDOM_CHARACTERISTIC_UUID	0xBB01
+#define VERIFY_CHARACTERISTIC_UUID    0xBB02
+#define ANTILOST_CHARACTERISTIC_UUID	0XBB03 	
+
+//binding service
+#define BINDING_SERVECE_UUID 					0xAA02
+#define SERVER_KEY_CHARACTERISTIC_UUID		0xBB04
+#define WATCH_KEY_CHARACTERISTIC_UUID		0xBB05
+
 #define APP_ADV_INTERVAL                64                                          /**< The advertising interval (in units of 0.625 ms. This value corresponds to 40 ms). */
 #define APP_ADV_TIMEOUT_IN_SECONDS      180                                         /**< The advertising timeout (in units of seconds). */
 

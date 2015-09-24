@@ -59,6 +59,7 @@ int main(void)
     // Initialize.
 	app_board_init();
     app_io_init(&erase_bonds); 
+	app_uart_rtx_init();
 
 	//ble stack,gap,service ect. initialize
 	app_ble_init();

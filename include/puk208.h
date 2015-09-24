@@ -129,6 +129,6 @@
 
 #define SER_CONN_ASSERT_LED_PIN     LED_0
 
-#define DEVICE_NAME "PUK208"
+#define DEVICE_NAME "xunqun"
 
 #endif
