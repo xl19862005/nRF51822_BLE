@@ -6,7 +6,11 @@
 *and send cmd to host*/
 
 //ring buffer max size
-#define MAX_RING_BUFFER_SIZE	 50
+#define MAX_RING_BUFFER_SIZE	 256
+
+//send data buffer max size
+#define MAX_SEND_DATA_SIZE (MAX_RING_BUFFER_SIZE - 9)// 9 is for 2heads + 1cmdcnt + 1Len + 1cmdlen + 1device + 1code +2crc
+
 //a package of the cmd head
 #define CMD_HEAD0		0x5A
 #define CMD_HEAD1		0xA5
@@ -24,8 +28,15 @@ typedef struct{
 	uint8_t buffer[MAX_RING_BUFFER_SIZE];
 }app_uart_buffer_t;
 
+typedef struct{
+	bool isBusy;
+	uint8_t buffer[MAX_RING_BUFFER_SIZE];
+}app_uart_send_buffer_t;
+
 void uart_buffer_push_data(uint8_t data);
 uint8_t uart_buffer_pull_data(int iget, crc_type type);
-void app_uart_evt_dispatch(void);
+void app_uart_evt_analyse(void);
+void app_uart_evt_package_send(void);
 void app_uart_rtx_init(void);
+void get_uart_data(app_uart_buffer_t* rx);
 #endif

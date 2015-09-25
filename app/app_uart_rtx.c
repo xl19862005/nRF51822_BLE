@@ -1,6 +1,14 @@
 #include "app_uart_rtx.h"
 
 app_uart_buffer_t uart_rx;
+app_uart_send_buffer_t uart_tx;
+
+
+
+void get_uart_data(app_uart_buffer_t* rx)
+{
+	rx = & uart_rx;
+}
 
 void uart_buffer_push_data(uint8_t data)
 {
@@ -98,11 +106,11 @@ static void device_cmd_dispatch()
 		break;
 
 		case BLE_PHOTO_KEY_STATUS:
-
+			ble_photo_key_status_process(len);
 		break;
 
 		case BLE_FINDER_STATUS:
-
+			ble_finder_status_process(len);
 		break;
 
 		case BLE_BOND_ACT_STATUS:
@@ -112,6 +120,22 @@ static void device_cmd_dispatch()
 		case BLE_LINK_CHECK_STATUS:
 
 		break;
+
+		case BLE_RF_DB_SET:
+
+		break;
+
+		case BLE_INTERVAL_SET:
+
+		break;
+
+		case BLE_DISCOVERY_SET:
+
+		break;
+
+		case BLE_HOST_GUEST_SET:
+
+		break;	
 
 		case BLE_PROXIMITY:
 
@@ -130,10 +154,19 @@ static void device_cmd_dispatch()
 void app_uart_rtx_init(void)
 {
 	memset(&uart_rx, 0, sizeof(app_uart_buffer_t));
+	memset(&uart_tx, 0, sizeof(app_uart_send_buffer_t));
+}
+
+void 
+
+/*uart send cmd package*/
+void app_uart_evt_package_send(void)
+{
+	
 }
 
 /*dispatch uart event to the process*/
-void app_uart_evt_dispatch(void)
+void app_uart_evt_analyse(void)
 {
 	int i,iput,iget,L,cmdCnt,l;
 	uint8_t head0,head1;

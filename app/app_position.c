@@ -21,7 +21,7 @@ void ble_positon_status_process(int len)
 		break;
 
 		default:
-			LOG_DEBUG("The watch lock status code is unknow!");
+			LOG_DEBUG("The ble positon status code is unknow!");
 		break;	
 	}
 }

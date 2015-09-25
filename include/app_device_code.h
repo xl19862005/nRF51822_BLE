@@ -9,21 +9,13 @@ typedef enum{
 	BLE_FINDER_STATUS,
 	BLE_BOND_ACT_STATUS,
 	BLE_LINK_CHECK_STATUS,
+	BLE_RF_DB_SET,
+	BLE_INTERVAL_SET,
+	BLE_DISCOVERY_SET,
+	BLE_HOST_GUEST_SET,
 	BLE_PROXIMITY,
 	BLE_ACCEL
 }ble_device_t;
-
-//ble photo key codes
-typedef enum{
-	BLE_PHOTO_KEY_DISABLE = 0x00,
-	BLE_PHOTO_KEY_ENABLE
-}ble_photo_key_status_t;
-
-//ble finder codes
-typedef enum{
-	BLE_FINDER_DISABLE = 0x00,
-	BLE_FINDER_ENABLE
-}ble_finder_status_t;
 
 //ble bond act. codes
 typedef enum{
