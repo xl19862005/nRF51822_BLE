@@ -1,8 +1,21 @@
 #include "app_uart_rtx.h"
+#include "app_watch_lock.h"
+#include "app_position.h"
+#include "app_photo_key.h"
+#include "app_finder.h"
 
 app_uart_buffer_t uart_rx;
 app_uart_send_buffer_t uart_tx;
-
+const app_uart_rx_cb_t rx_cb[BLE_ENUM_END-1] = {
+	watch_lock_status_process,
+	ble_positon_status_process,
+	ble_photo_key_status_process,
+	ble_finder_status_process,
+	//other funs.
+	//.
+	//.
+	//.
+};
 
 
 void get_uart_data(app_uart_buffer_t* rx)
@@ -50,12 +63,13 @@ static bool is_cmd_head(uint16_t head)
 	return (head == CMD_HEAD);
 }
 
-static uint16_t crc16_check(int iget, uint16_t data_length)
+static uint16_t crc16_check(int iget, uint16_t data_length, crc_type type)
 {
 	/*polynomial*/
 	uint16_t crc_gen = 0x1021;
 	uint16_t crc;
 	int i, j;
+	app_uart_send_buffer_t* psb = &uart_tx;
 
 
 	/*init value of crc*/
@@ -65,8 +79,10 @@ static uint16_t crc16_check(int iget, uint16_t data_length)
 	{
 		for (i = 0; i < data_length; i++)
 		{
-			
-			crc ^= (uint16_t)(uart_buffer_pull_data(iget+i, CRC_GEN));
+			if(type == CRC_GEN)
+				crc ^= (uint16_t)(uart_buffer_pull_data(iget+i, CRC_GEN));
+			else
+				crc ^= (uint16_t)(psb->buffer[i]);
 			for (j = 0; j < 8; j++)
 			{
 				if ((crc & 0x01)  == 0x01)   
@@ -95,60 +111,7 @@ static void device_cmd_dispatch()
 
 	printf("device_cmd_dispatch: len=%d,device=0x%x\n",len,device);
 
-	switch(device)
-	{
-		case BLE_WATCH_LOCK_STATUS:
-			watch_lock_status_process(len);
-		break;
-
-		case BLE_POSITION_STATUS:
-			ble_positon_status_process(len);
-		break;
-
-		case BLE_PHOTO_KEY_STATUS:
-			ble_photo_key_status_process(len);
-		break;
-
-		case BLE_FINDER_STATUS:
-			ble_finder_status_process(len);
-		break;
-
-		case BLE_BOND_ACT_STATUS:
-
-		break;
-
-		case BLE_LINK_CHECK_STATUS:
-
-		break;
-
-		case BLE_RF_DB_SET:
-
-		break;
-
-		case BLE_INTERVAL_SET:
-
-		break;
-
-		case BLE_DISCOVERY_SET:
-
-		break;
-
-		case BLE_HOST_GUEST_SET:
-
-		break;	
-
-		case BLE_PROXIMITY:
-
-		break;
-
-		case BLE_ACCEL:
-
-		break;
-
-		default:
-			LOG_DEBUG("This's a unknow device!");
-		break;
-	}
+	rx_cb[device].cb(len);
 }
 
 void app_uart_rtx_init(void)
@@ -157,12 +120,70 @@ void app_uart_rtx_init(void)
 	memset(&uart_tx, 0, sizeof(app_uart_send_buffer_t));
 }
 
-void 
+/*package the send event*/
+static void send_evt_package(app_uart_send_buffer_t *psb)
+{
+	int i;
+	uint16_t crc;
+
+	psb->isBusy = true;
+
+	//add head
+	psb->buffer[0] = CMD_HEAD0;
+	psb->buffer[1] = CMD_HEAD1;
+
+	//add cmds count
+	psb->buffer[2] = psb->cmdCnt;
+
+	//add cmds length
+	psb->buffer[3] = psb->iput - 4;
+
+	//add crc 2 bytes
+	crc = crc16_check(0, psb->iput, CRC_SEND_GEN);
+	psb->buffer[psb->iput++] = (crc | 0xFF00) >> 8;
+	psb->buffer[psb->iput++] = crc | 0x00FF;
+}
+
+void app_uart_tx_buffer_push(int device, int code, const uint8_t* data, int len)
+{
+	app_uart_send_buffer_t	 *psb = &uart_tx;
+
+	psb->buffer[4] = 2 + len;
+	psb->buffer[5] = device;
+	psb->buffer[6] = code;
+
+	memcpy(&psb->buffer[7],data,len);
+	
+	psb->iput = 7 + len;
+	psb->isReady = true;
+	psb->isBusy = true;
+}
 
 /*uart send cmd package*/
-void app_uart_evt_package_send(void)
+void app_uart_evt_send(void)
 {
-	
+	int i, timeout = 5000;//timeout
+	app_uart_send_buffer_t	 *psb = &uart_tx;
+
+	if(psb->isReady)
+	{
+		send_evt_package(psb);
+
+		for(int i=0;i<psb->iput;i++)
+		{
+			timeout = 5000;
+			while(app_uart_put(psb->buffer[i]) != NRF_SUCCESS)
+			{
+				if(timeout-- <= 0)
+				{
+					LOG_DEBUG("app_uart_evt_send timeout!");
+				}
+			}
+			
+		}
+
+		memset(&uart_tx, 0, sizeof(app_uart_send_buffer_t));
+	}
 }
 
 /*dispatch uart event to the process*/
@@ -177,7 +198,7 @@ void app_uart_evt_analyse(void)
 	iget = pbf->iget;
 
 	//in same condition iput or iget will biger than MAX value?
-	if((iput == iget) || (iput > MAX_RING_BUFFER_SIZE) || (iget > MAX_RING_BUFFER_SIZE))
+	if((iput > MAX_RING_BUFFER_SIZE) || (iget > MAX_RING_BUFFER_SIZE))
 	{
 		app_uart_rtx_init();
 		return;
@@ -204,7 +225,7 @@ void app_uart_evt_analyse(void)
 			if(L >= (l+6))//head2+cmdnum1+len1+l+crc2
 			{
 				crc = uart_buffer_pull_data(pbf->iget+l,CRC_WORD) << 8 | uart_buffer_pull_data(pbf->iget+l+1,CRC_WORD);
-				if(crc16_check(iget, L-2) == crc)
+				if(crc16_check(iget, L-2, CRC_GEN) == crc)
 				{
 					for(i=0;i<cmdCnt;i++)
 					{

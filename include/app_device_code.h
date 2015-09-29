@@ -14,7 +14,8 @@ typedef enum{
 	BLE_DISCOVERY_SET,
 	BLE_HOST_GUEST_SET,
 	BLE_PROXIMITY,
-	BLE_ACCEL
+	BLE_ACCEL,
+	BLE_ENUM_END
 }ble_device_t;
 
 //ble bond act. codes

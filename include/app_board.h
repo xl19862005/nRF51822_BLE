@@ -28,8 +28,8 @@
 #define APP_TIMER_MAX_TIMERS            (2 + BSP_APP_TIMERS_NUMBER)                 /**< Maximum number of simultaneously created timers. */
 #define APP_TIMER_OP_QUEUE_SIZE         4                                           /**< Size of timer operation queues. */
 
-#define UART_TX_BUF_SIZE                256                                         /**< UART TX buffer size. */
-#define UART_RX_BUF_SIZE                256                                         /**< UART RX buffer size. */
+#define UART_TX_BUF_SIZE                UART_BUFFER_SIZE                                         /**< UART TX buffer size. */
+#define UART_RX_BUF_SIZE                UART_BUFFER_SIZE                                         /**< UART RX buffer size. */
 
 void app_board_init(void);
 

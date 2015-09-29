@@ -130,5 +130,5 @@
 #define SER_CONN_ASSERT_LED_PIN     LED_0
 
 #define DEVICE_NAME "xunqun"
-
+#define UART_BUFFER_SIZE			256
 #endif

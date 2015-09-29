@@ -70,7 +70,7 @@ int main(void)
     for (;;)
     {
 		app_uart_evt_analyse();
-		app_uart_evt_package_send();
+		app_uart_evt_send();
 		power_manage();
     }
 }
