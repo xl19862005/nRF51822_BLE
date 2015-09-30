@@ -3,6 +3,11 @@
 #include "app_position.h"
 #include "app_photo_key.h"
 #include "app_finder.h"
+#include "app_bond_act.h"
+#include "app_link_check.h"
+#include "app_settings.h"
+#include "app_proximity.h"
+#include "app_accel.h"
 
 app_uart_buffer_t uart_rx;
 app_uart_send_buffer_t uart_tx;
@@ -11,6 +16,11 @@ const app_uart_rx_cb_t rx_cb[BLE_ENUM_END-1] = {
 	ble_positon_status_process,
 	ble_photo_key_status_process,
 	ble_finder_status_process,
+	ble_bond_action_process,
+	ble_link_check_process,
+	ble_settings_process,
+	ble_proximity_process,
+	ble_accel_process
 	//other funs.
 	//.
 	//.
