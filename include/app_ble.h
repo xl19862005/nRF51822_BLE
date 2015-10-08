@@ -12,17 +12,6 @@
 #define SERVICE_CHARACTERISTIC_VALUE            {0,0,0}
 #define SERVICE_CHARACTERISTIC_DESCRIPTOR_UUID  0x9002
 
-//action service
-#define ACTION_SERVECE_UUID				0xAA01
-#define RANDOM_CHARACTERISTIC_UUID	0xBB01
-#define VERIFY_CHARACTERISTIC_UUID    0xBB02
-#define ANTILOST_CHARACTERISTIC_UUID	0XBB03 	
-
-//binding service
-#define BINDING_SERVECE_UUID 					0xAA02
-#define SERVER_KEY_CHARACTERISTIC_UUID		0xBB04
-#define WATCH_KEY_CHARACTERISTIC_UUID		0xBB05
-
 #define APP_ADV_INTERVAL                64                                          /**< The advertising interval (in units of 0.625 ms. This value corresponds to 40 ms). */
 #define APP_ADV_TIMEOUT_IN_SECONDS      180                                         /**< The advertising timeout (in units of seconds). */
 
@@ -34,6 +23,15 @@
 #define NEXT_CONN_PARAMS_UPDATE_DELAY   APP_TIMER_TICKS(30000, APP_TIMER_PRESCALER) /**< Time between each call to sd_ble_gap_conn_param_update after the first call (30 seconds). */
 #define MAX_CONN_PARAMS_UPDATE_COUNT    3                                           /**< Number of attempts before giving up the connection parameter negotiation. */
 
+typedef struct{
+	uint8_t watch_lock_status;
+	uint8_t location_enable;
+	uint8_t photo_key_press;
+	uint8_t finder_status;
+	uint8_t binding_status;
+}own_manuf_data_t;
+
 void sleep_mode_enter(void);
 void app_ble_init(void);
+void app_advertising_restart(own_manuf_data_t* p_manuf_data);
 #endif

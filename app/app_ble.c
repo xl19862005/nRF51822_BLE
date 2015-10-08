@@ -2,8 +2,11 @@
 
 extern uint16_t                         m_conn_handle;
 extern ble_nus_t                        m_nus; 
+extern uint8_t							  my_test;
 
 static ble_uuid_t                       m_adv_uuids[] = {{BLE_UUID_NUS_SERVICE, NUS_SERVICE_UUID_TYPE}};  /**< Universally unique service identifier. */
+
+own_manuf_data_t manuf_data;
 
 /**@brief Function for the Application's S110 SoftDevice event handler.
  *
@@ -276,11 +279,12 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
 
 /**@brief Function for initializing the Advertising functionality.
  */
-static void advertising_init(void)
+static void advertising_init(own_manuf_data_t* p_manuf_data)
 {
     uint32_t      err_code;
     ble_advdata_t advdata;
     ble_advdata_t scanrsp;
+	ble_advdata_manuf_data_t advmdata;
 
     // Build advertising data struct to pass into @ref ble_advertising_init.
     memset(&advdata, 0, sizeof(advdata));
@@ -289,8 +293,15 @@ static void advertising_init(void)
     advdata.flags              = BLE_GAP_ADV_FLAGS_LE_ONLY_LIMITED_DISC_MODE;
 
     memset(&scanrsp, 0, sizeof(scanrsp));
+	memset(&advmdata, 0, sizeof(advmdata));
     scanrsp.uuids_complete.uuid_cnt = sizeof(m_adv_uuids) / sizeof(m_adv_uuids[0]);
     scanrsp.uuids_complete.p_uuids  = m_adv_uuids;
+
+	//Set the manuf. specific data
+	advmdata.company_identifier = APP_COMPANY_IDENTIFIER;
+	advmdata.data.size = sizeof(p_manuf_data);
+	advmdata.data.p_data = (uint8_t*)p_manuf_data;
+	scanrsp.p_manuf_specific_data = &advmdata;
 
     ble_adv_modes_config_t options = {0};
     options.ble_adv_fast_enabled  = BLE_ADV_FAST_ENABLED;
@@ -301,6 +312,15 @@ static void advertising_init(void)
     APP_ERROR_CHECK(err_code);
 }
 
+void app_advertising_restart(own_manuf_data_t* p_manuf_data)
+{
+    uint32_t      err_code;
+
+	advertising_init(p_manuf_data);
+	err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
+	APP_ERROR_CHECK(err_code);
+}
+
 void app_ble_init(void)
 {
     uint32_t      err_code;
@@ -308,7 +328,7 @@ void app_ble_init(void)
 	ble_stack_init();
 	gap_params_init();
 	services_init();
-    advertising_init();
+    advertising_init(&manuf_data);
     conn_params_init();
 
 	err_code = ble_advertising_start(BLE_ADV_MODE_FAST);

@@ -2,6 +2,11 @@
 #define _APP_LINK_CHECK_H
 #include "app_board.h"
 
+//binding service
+#define BINDING_SERVECE_UUID 					0xAA02
+#define SERVER_KEY_CHARACTERISTIC_UUID		0xBB04
+#define WATCH_KEY_CHARACTERISTIC_UUID		0xBB05
+
 typedef enum{
 	BLE_LINK_CHECK_ASK = 0x00,
 	BLE_LINK_CHECK_PASS	

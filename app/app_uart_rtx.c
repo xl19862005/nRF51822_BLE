@@ -121,7 +121,7 @@ static void device_cmd_dispatch()
 
 	printf("device_cmd_dispatch: len=%d,device=0x%x\n",len,device);
 
-	rx_cb[device].cb(len);
+	rx_cb[device-1].cb(len);
 }
 
 void app_uart_rtx_init(void)

@@ -516,6 +516,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\app\app_watch_lock.c</FilePath>
             </File>
+            <File>
+              <FileName>app_settings.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\app\app_settings.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1065,6 +1070,11 @@
               <FileName>app_watch_lock.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\app\app_watch_lock.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_settings.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\app\app_settings.c</FilePath>
             </File>
           </Files>
         </Group>

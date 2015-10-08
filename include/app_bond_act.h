@@ -2,6 +2,12 @@
 #define _APP_BOND_ACT_H
 #include "app_board.h"
 
+//action service
+#define ACTION_SERVECE_UUID				0xAA01
+#define RANDOM_CHARACTERISTIC_UUID	0xBB01
+#define VERIFY_CHARACTERISTIC_UUID    0xBB02
+#define ANTILOST_CHARACTERISTIC_UUID	0XBB03 	
+
 //ble bond act. codes
 typedef enum{
 	BLE_BOND_ACT_EXIT = 0x00,

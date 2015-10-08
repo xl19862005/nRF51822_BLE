@@ -129,6 +129,9 @@
 
 #define SER_CONN_ASSERT_LED_PIN     LED_0
 
-#define DEVICE_NAME "xunqun"
+#define DEVICE_NAME 							   "xunqun"
+#define MANUFACTURER_NAME                    "xunqun"                      /**< Manufacturer. Will be passed to Device Information Service. */
+#define APP_COMPANY_IDENTIFIER			0x004C
+
 #define UART_BUFFER_SIZE			256
 #endif
