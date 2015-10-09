@@ -25,7 +25,7 @@
 
 typedef struct{
 	uint8_t watch_lock_status;
-	uint8_t location_enable;
+	uint8_t position_enable;
 	uint8_t photo_key_press;
 	uint8_t finder_status;
 	uint8_t binding_status;
@@ -33,5 +33,6 @@ typedef struct{
 
 void sleep_mode_enter(void);
 void app_ble_init(void);
-void app_advertising_restart(own_manuf_data_t* p_manuf_data);
+void app_advertising_stop();
+void app_advertising_restart(uint32_t adv_interval_ms, uint32_t adv_timeout_sec, uint8_t adv_type, own_manuf_data_t* p_manuf_data);
 #endif

@@ -8,5 +8,5 @@ typedef enum{
 	BLE_POSITION_ENABLE	
 }ble_position_status_t;
 
-void ble_positon_status_process(int len);
+void ble_position_status_process(int len);
 #endif

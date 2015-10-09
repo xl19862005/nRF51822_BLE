@@ -63,9 +63,8 @@ int main(void)
 
 	//ble stack,gap,service ect. initialize
 	app_ble_init();
-	//app_own_ad_service_init(erase_bonds);
 	    
-    LOG_INFO("Starting...");
+    printf("Starting...\n");
     
     // Enter main loop.
     for (;;)

@@ -1,6 +1,7 @@
 #include "app_photo_key.h"
 
 extern app_uart_buffer_t uart_rx;
+extern own_manuf_data_t manuf_data;
 
 void ble_photo_key_status_process(int len)
 {
@@ -8,21 +9,12 @@ void ble_photo_key_status_process(int len)
 
 	ble_photo_key_status_t code = uart_buffer_pull_data(pbf->iget,NO_CRC);
 
-	//printf("watch_lock_status_process: code=0x%x\n",code);
 	printf("code=0x%x,iget=%d,iput=%d\n",code,pbf->iget,pbf->iput);
-	switch(code)
+	if((code == BLE_PHOTO_KEY_DISABLE)|| (code == BLE_PHOTO_KEY_ENABLE))
 	{
-		case BLE_PHOTO_KEY_DISABLE:
-			
-		break;
-
-		case BLE_PHOTO_KEY_ENABLE:
-
-		break;
-
-		default:
-			LOG_DEBUG("The photo key status code is unknow!");
-		break;	
+		app_advertising_stop();
+		manuf_data.photo_key_press = code;
+		app_advertising_restart(50, 0, BLE_GAP_ADV_TYPE_ADV_NONCONN_IND, &manuf_data);
 	}
 }
 

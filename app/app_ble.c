@@ -2,11 +2,12 @@
 
 extern uint16_t                         m_conn_handle;
 extern ble_nus_t                        m_nus; 
-extern uint8_t							  my_test;
 
 static ble_uuid_t                       m_adv_uuids[] = {{BLE_UUID_NUS_SERVICE, NUS_SERVICE_UUID_TYPE}};  /**< Universally unique service identifier. */
+static ble_gap_adv_params_t     	   m_adv_params;  
 
 own_manuf_data_t manuf_data;
+bool is_advertising_start = false;
 
 /**@brief Function for the Application's S110 SoftDevice event handler.
  *
@@ -67,13 +68,20 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
  */
 static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 {
-    ble_conn_params_on_ble_evt(p_ble_evt);
-    ble_nus_on_ble_evt(&m_nus, p_ble_evt);
     on_ble_evt(p_ble_evt);
-    ble_advertising_on_ble_evt(p_ble_evt);
-    bsp_btn_ble_on_ble_evt(p_ble_evt);
 }
 
+/**@brief Function for dispatching a system event to interested modules.
+ *
+ * @details This function is called from the System event interrupt handler after a system
+ *          event has been received.
+ *
+ * @param[in]   sys_evt   System stack event.
+ */
+static void sys_evt_dispatch(uint32_t sys_evt)
+{
+
+}
 
 /**@brief Function for the S110 SoftDevice initialization.
  *
@@ -88,7 +96,7 @@ static void ble_stack_init(void)
 
     // Enable BLE stack.
     ble_enable_params_t ble_enable_params;
-    memset(&ble_enable_params, 0, sizeof(ble_enable_params));
+    memset(&ble_enable_params, 0, sizeof(ble_enable_params_t));
 #ifdef S130
     ble_enable_params.gatts_enable_params.attr_tab_size   = BLE_GATTS_ATTR_TAB_SIZE_DEFAULT;
 #endif
@@ -98,6 +106,10 @@ static void ble_stack_init(void)
     
     // Subscribe for BLE events.
     err_code = softdevice_ble_evt_handler_set(ble_evt_dispatch);
+    APP_ERROR_CHECK(err_code);
+
+    // Register with the SoftDevice handler module for BLE events.
+    err_code = softdevice_sys_evt_handler_set(sys_evt_dispatch);
     APP_ERROR_CHECK(err_code);
 }
 
@@ -124,7 +136,7 @@ static void gap_params_init(void)
 	sprintf(device_name,"%s",DEVICE_NAME);
 	for(i=BLE_GAP_ADDR_LEN-1;i>=0;i--)
 	{
-		sprintf(tmp,"-%2x",gap_addr.addr[i]);
+		sprintf(tmp,"%2x",gap_addr.addr[i]);
 		strcat(device_name,tmp);
 	}
     
@@ -133,7 +145,7 @@ static void gap_params_init(void)
                                           strlen(device_name));
     APP_ERROR_CHECK(err_code);
 
-    memset(&gap_conn_params, 0, sizeof(gap_conn_params));
+    memset(&gap_conn_params, 0, sizeof(ble_gap_conn_params_t));
 
     gap_conn_params.min_conn_interval = MIN_CONN_INTERVAL;
     gap_conn_params.max_conn_interval = MAX_CONN_INTERVAL;
@@ -143,96 +155,6 @@ static void gap_params_init(void)
     err_code = sd_ble_gap_ppcp_set(&gap_conn_params);
     APP_ERROR_CHECK(err_code);
 }
-
-/**@brief Function for handling the data from the Nordic UART Service.
- *
- * @details This function will process the data received from the Nordic UART BLE Service and send
- *          it to the UART module.
- *
- * @param[in] p_nus    Nordic UART Service structure.
- * @param[in] p_data   Data to be send to UART module.
- * @param[in] length   Length of the data.
- */
-/**@snippet [Handling the data received over BLE] */
-static void nus_data_handler(ble_nus_t * p_nus, uint8_t * p_data, uint16_t length)
-{
-    for (uint32_t i = 0; i < length; i++)
-    {
-        while(app_uart_put(p_data[i]) != NRF_SUCCESS);
-    }
-    while(app_uart_put('\n') != NRF_SUCCESS);
-}
-/**@snippet [Handling the data received over BLE] */
-
-
-/**@brief Function for initializing services that will be used by the application.
- */
-static void services_init(void)
-{
-    uint32_t       err_code;
-    ble_nus_init_t nus_init;
-    
-    memset(&nus_init, 0, sizeof(nus_init));
-
-    nus_init.data_handler = nus_data_handler;
-    
-    err_code = ble_nus_init(&m_nus, &nus_init);
-    APP_ERROR_CHECK(err_code);
-}
-
-/**@brief Function for handling an event from the Connection Parameters Module.
- *
- * @details This function will be called for all events in the Connection Parameters Module
- *          which are passed to the application.
- *
- * @note All this function does is to disconnect. This could have been done by simply setting
- *       the disconnect_on_fail config parameter, but instead we use the event handler
- *       mechanism to demonstrate its use.
- *
- * @param[in] p_evt  Event received from the Connection Parameters Module.
- */
-static void on_conn_params_evt(ble_conn_params_evt_t * p_evt)
-{
-    uint32_t err_code;
-    
-    if(p_evt->evt_type == BLE_CONN_PARAMS_EVT_FAILED)
-    {
-        err_code = sd_ble_gap_disconnect(m_conn_handle, BLE_HCI_CONN_INTERVAL_UNACCEPTABLE);
-        APP_ERROR_CHECK(err_code);
-    }
-}
-
-/**@brief Function for handling errors from the Connection Parameters module.
- *
- * @param[in] nrf_error  Error code containing information about what went wrong.
- */
-static void conn_params_error_handler(uint32_t nrf_error)
-{
-    APP_ERROR_HANDLER(nrf_error);
-}
-
-/**@brief Function for initializing the Connection Parameters module.
- */
-static void conn_params_init(void)
-{
-    uint32_t               err_code;
-    ble_conn_params_init_t cp_init;
-    
-    memset(&cp_init, 0, sizeof(cp_init));
-
-    cp_init.p_conn_params                  = NULL;
-    cp_init.first_conn_params_update_delay = FIRST_CONN_PARAMS_UPDATE_DELAY;
-    cp_init.next_conn_params_update_delay  = NEXT_CONN_PARAMS_UPDATE_DELAY;
-    cp_init.max_conn_params_update_count   = MAX_CONN_PARAMS_UPDATE_COUNT;
-    cp_init.start_on_notify_cccd_handle    = BLE_GATT_HANDLE_INVALID;
-    cp_init.disconnect_on_fail             = false;
-    cp_init.evt_handler                    = on_conn_params_evt;
-    cp_init.error_handler                  = conn_params_error_handler;
-    
-    err_code = ble_conn_params_init(&cp_init);
-    APP_ERROR_CHECK(err_code);
-}
-
 
 /**@brief Function for putting the chip into sleep mode.
  *
@@ -252,73 +174,114 @@ void sleep_mode_enter(void)
     APP_ERROR_CHECK(err_code);
 }
 
-
-/**@brief Function for handling advertising events.
+/**@brief Function for initializing the Advertisement packet.
  *
- * @details This function will be called for advertising events which are passed to the application.
+ * @details This function initializes the data that is to be placed in an advertisement packet in 
+ *          both connectable and non-connectable modes.
  *
- * @param[in] ble_adv_evt  Advertising event.
  */
-static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
+static void advertising_data_init(own_manuf_data_t* p_manuf_data)
 {
-    uint32_t err_code;
+    uint32_t                   err_code;
+    ble_advdata_t              advdata;
+    ble_advdata_manuf_data_t   manuf_data;
 
-    switch (ble_adv_evt)
-    {
-        case BLE_ADV_EVT_FAST:
-            err_code = bsp_indication_set(BSP_INDICATE_ADVERTISING);
-            APP_ERROR_CHECK(err_code);
-            break;
-        case BLE_ADV_EVT_IDLE:
-            sleep_mode_enter();
-            break;
-        default:
-            break;
-    }
-}
+    // Build and set advertising data
+    memset(&advdata, 0, sizeof(ble_advdata_t));
+	memset(&manuf_data, 0, sizeof(ble_advdata_manuf_data_t));
 
-/**@brief Function for initializing the Advertising functionality.
- */
-static void advertising_init(own_manuf_data_t* p_manuf_data)
-{
-    uint32_t      err_code;
-    ble_advdata_t advdata;
-    ble_advdata_t scanrsp;
-	ble_advdata_manuf_data_t advmdata;
-
-    // Build advertising data struct to pass into @ref ble_advertising_init.
-    memset(&advdata, 0, sizeof(advdata));
+    advdata.flags                 = BLE_GAP_ADV_FLAG_BR_EDR_NOT_SUPPORTED;
     advdata.name_type          = BLE_ADVDATA_FULL_NAME;
-    advdata.include_appearance = false;
-    advdata.flags              = BLE_GAP_ADV_FLAGS_LE_ONLY_LIMITED_DISC_MODE;
 
-    memset(&scanrsp, 0, sizeof(scanrsp));
-	memset(&advmdata, 0, sizeof(advmdata));
-    scanrsp.uuids_complete.uuid_cnt = sizeof(m_adv_uuids) / sizeof(m_adv_uuids[0]);
-    scanrsp.uuids_complete.p_uuids  = m_adv_uuids;
+	//set the manuf. specific data to the scan data
+	manuf_data.company_identifier = APP_COMPANY_IDENTIFIER;
+	manuf_data.data.size = sizeof(own_manuf_data_t);
+	manuf_data.data.p_data = (uint8_t*)p_manuf_data;
+	advdata.p_manuf_specific_data = &manuf_data;
 
-	//Set the manuf. specific data
-	advmdata.company_identifier = APP_COMPANY_IDENTIFIER;
-	advmdata.data.size = sizeof(p_manuf_data);
-	advmdata.data.p_data = (uint8_t*)p_manuf_data;
-	scanrsp.p_manuf_specific_data = &advmdata;
-
-    ble_adv_modes_config_t options = {0};
-    options.ble_adv_fast_enabled  = BLE_ADV_FAST_ENABLED;
-    options.ble_adv_fast_interval = APP_ADV_INTERVAL;
-    options.ble_adv_fast_timeout  = APP_ADV_TIMEOUT_IN_SECONDS;
-
-    err_code = ble_advertising_init(&advdata, &scanrsp, &options, on_adv_evt, NULL);
+    err_code = ble_advdata_set(&advdata, NULL);
     APP_ERROR_CHECK(err_code);
 }
 
-void app_advertising_restart(own_manuf_data_t* p_manuf_data)
+
+static void manufacture_data_init(void)
+{
+	memset(&manuf_data, 0, sizeof(own_manuf_data_t));
+}
+
+/**@brief Function for initializing the connectable advertisement parameters.
+ *
+ * @details This function initializes the advertisement parameters to values that will put 
+ *          the application in connectable mode.
+ *
+ */
+static void connectable_adv_init(uint32_t adv_interval_ms, uint32_t adv_timeout_sec)
+{
+    // Initialize advertising parameters (used when starting advertising).
+    memset(&m_adv_params, 0, sizeof(ble_gap_adv_params_t));
+    
+    m_adv_params.type        = BLE_GAP_ADV_TYPE_ADV_IND ;
+    m_adv_params.p_peer_addr = NULL;                               // Undirected advertisement
+    m_adv_params.fp          = BLE_GAP_ADV_FP_ANY;
+    m_adv_params.interval    = MSEC_TO_UNITS(adv_interval_ms, UNIT_0_625_MS);
+    m_adv_params.timeout     = adv_timeout_sec;
+}
+
+
+/**@brief Function for initializing the non-connectable advertisement parameters.
+ *
+ * @details This function initializes the advertisement parameters to values that will put 
+ *          the application in non-connectable mode.
+ *
+ */
+static void non_connectable_adv_init(uint32_t adv_interval_ms, uint32_t adv_timeout_sec)
+{
+    // Initialize advertising parameters (used when starting advertising).
+    memset(&m_adv_params, 0, sizeof(ble_gap_adv_params_t));
+
+    m_adv_params.type        = BLE_GAP_ADV_TYPE_ADV_NONCONN_IND;
+    m_adv_params.p_peer_addr = NULL;                               // Undirected advertisement
+    m_adv_params.fp          = BLE_GAP_ADV_FP_ANY;
+    m_adv_params.interval    = MSEC_TO_UNITS(adv_interval_ms, UNIT_0_625_MS);
+    m_adv_params.timeout     = adv_timeout_sec;
+}
+
+/**@brief Function for starting advertising.
+ */
+static void advertising_start(void)
+{
+    uint32_t err_code;
+    
+    err_code = sd_ble_gap_adv_start(&m_adv_params);
+    APP_ERROR_CHECK(err_code);
+}
+
+void app_advertising_stop()
 {
     uint32_t      err_code;
 
-	advertising_init(p_manuf_data);
-	err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
-	APP_ERROR_CHECK(err_code);
+	if(is_advertising_start)
+	{
+		err_code = sd_ble_gap_adv_stop();
+		APP_ERROR_CHECK(err_code);
+		is_advertising_start = false;
+	}
+}
+
+void app_advertising_restart(uint32_t adv_interval_ms, uint32_t adv_timeout_sec, uint8_t adv_type, own_manuf_data_t* p_manuf_data)
+{
+	if(adv_type == BLE_GAP_ADV_TYPE_ADV_NONCONN_IND)
+	{
+		non_connectable_adv_init(adv_interval_ms, adv_timeout_sec);
+	}else if(adv_type == BLE_GAP_ADV_TYPE_ADV_IND)
+	{
+		connectable_adv_init(adv_interval_ms, adv_timeout_sec);
+		//start own_service at here
+	}
+
+	advertising_data_init(p_manuf_data);
+	advertising_start();
+	is_advertising_start = true;
 }
 
 void app_ble_init(void)
@@ -327,10 +290,7 @@ void app_ble_init(void)
 
 	ble_stack_init();
 	gap_params_init();
-	services_init();
-    advertising_init(&manuf_data);
-    conn_params_init();
+	manufacture_data_init();
 
-	err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
-	APP_ERROR_CHECK(err_code);
+	app_advertising_restart(100, 0, BLE_GAP_ADV_TYPE_ADV_NONCONN_IND, &manuf_data);
 }

@@ -4,20 +4,18 @@
 #include "app_photo_key.h"
 #include "app_finder.h"
 #include "app_bond_act.h"
-#include "app_link_check.h"
 #include "app_settings.h"
 #include "app_proximity.h"
 #include "app_accel.h"
 
 app_uart_buffer_t uart_rx;
 app_uart_send_buffer_t uart_tx;
-const app_uart_rx_cb_t rx_cb[BLE_ENUM_END-1] = {
+const app_uart_rx_cb_t rx_cb[BLE_ENUM_END] = {
 	watch_lock_status_process,
-	ble_positon_status_process,
+	ble_position_status_process,
 	ble_photo_key_status_process,
 	ble_finder_status_process,
 	ble_bond_action_process,
-	ble_link_check_process,
 	ble_settings_process,
 	ble_proximity_process,
 	ble_accel_process
@@ -120,8 +118,10 @@ static void device_cmd_dispatch()
 	ble_device_t device = uart_buffer_pull_data(pbf->iget,NO_CRC);
 
 	printf("device_cmd_dispatch: len=%d,device=0x%x\n",len,device);
-
-	rx_cb[device-1].cb(len);
+	if((device >= BLE_WATCH_LOCK_STATUS) && (device < BLE_ENUM_END))
+	{
+		rx_cb[device].cb(len);
+	}
 }
 
 void app_uart_rtx_init(void)
