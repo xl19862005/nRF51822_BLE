@@ -1,11 +1,10 @@
 #include "app_ble.h"
 
 extern uint16_t                         m_conn_handle;
-extern ble_nus_t                        m_nus; 
 
-static ble_uuid_t                       m_adv_uuids[] = {{BLE_UUID_NUS_SERVICE, NUS_SERVICE_UUID_TYPE}};  /**< Universally unique service identifier. */
 static ble_gap_adv_params_t     	   m_adv_params;  
 
+ble_action_service_t m_action;
 own_manuf_data_t manuf_data;
 bool is_advertising_start = false;
 
@@ -20,17 +19,18 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
     switch (p_ble_evt->header.evt_id)
     {
         case BLE_GAP_EVT_CONNECTED:
-            err_code = bsp_indication_set(BSP_INDICATE_CONNECTED);
+			err_code = bsp_indication_set(BSP_INDICATE_CONNECTED);
             APP_ERROR_CHECK(err_code);
             m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
-			LOG_INFO("Some one connected!");
+			printf("Some one connected!\n");
             break;
             
         case BLE_GAP_EVT_DISCONNECTED:
-            err_code = bsp_indication_set(BSP_INDICATE_IDLE);
+			err_code = bsp_indication_set(BSP_INDICATE_IDLE);
             APP_ERROR_CHECK(err_code);
             m_conn_handle = BLE_CONN_HANDLE_INVALID;
-			LOG_INFO("Some one disconnected!");
+			app_advertising_restart(100, 0, BLE_GAP_ADV_TYPE_ADV_NONCONN_IND, &manuf_data);
+			printf("Some one disconnected!\n");
             break;
 
         case BLE_GAP_EVT_SEC_PARAMS_REQUEST:
@@ -69,6 +69,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
 static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 {
     on_ble_evt(p_ble_evt);
+	ble_watch_action_on_ble_evt(&m_action, p_ble_evt);
 }
 
 /**@brief Function for dispatching a system event to interested modules.
@@ -260,6 +261,12 @@ void app_advertising_stop()
 {
     uint32_t      err_code;
 
+	if(m_conn_handle != BLE_CONN_HANDLE_INVALID)
+	{
+		err_code = sd_ble_gap_disconnect(m_conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+		APP_ERROR_CHECK(err_code);
+	}
+
 	if(is_advertising_start)
 	{
 		err_code = sd_ble_gap_adv_stop();
@@ -276,7 +283,6 @@ void app_advertising_restart(uint32_t adv_interval_ms, uint32_t adv_timeout_sec,
 	}else if(adv_type == BLE_GAP_ADV_TYPE_ADV_IND)
 	{
 		connectable_adv_init(adv_interval_ms, adv_timeout_sec);
-		//start own_service at here
 	}
 
 	advertising_data_init(p_manuf_data);

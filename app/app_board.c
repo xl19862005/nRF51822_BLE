@@ -1,7 +1,6 @@
 #include "app_board.h"
 
 uint16_t                         m_conn_handle = BLE_CONN_HANDLE_INVALID;    /**< Handle of the current connection. */
-ble_nus_t                        m_nus;                                      /**< Structure to identify the Nordic UART Service. */
 
 /*timers init*/
 static void timers_init(void)
@@ -30,21 +29,11 @@ void uart_event_handle(app_uart_evt_t * p_event)
 
 			//push the uart data to the ring buffer
 			uart_buffer_push_data(data_array[index]);
-
-			//printf("APP_UART_DATA_READY\n");
 			
             index++;
 
-            if ((data_array[index - 1] == '\n') || (index >= (BLE_NUS_MAX_DATA_LEN)))
-            {
-                err_code = ble_nus_string_send(&m_nus, data_array, index);
-                if (err_code != NRF_ERROR_INVALID_STATE)
-                {
-                    APP_ERROR_CHECK(err_code);
-                }
-                
-                index = 0;
-            }
+			if(index >= (BLE_NUS_MAX_DATA_LEN))
+				index = 0;
 			break;
 
         case APP_UART_COMMUNICATION_ERROR:

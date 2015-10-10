@@ -492,11 +492,6 @@
               <FilePath>..\..\..\app\app_finder.c</FilePath>
             </File>
             <File>
-              <FileName>app_link_check.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\app\app_link_check.c</FilePath>
-            </File>
-            <File>
               <FileName>app_photo_key.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\app\app_photo_key.c</FilePath>
@@ -520,6 +515,16 @@
               <FileName>app_settings.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\app\app_settings.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_own_service.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\app\app_own_service.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_profile.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\app\app_profile.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1047,11 +1052,6 @@
               <FilePath>..\..\..\app\app_finder.c</FilePath>
             </File>
             <File>
-              <FileName>app_link_check.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\app\app_link_check.c</FilePath>
-            </File>
-            <File>
               <FileName>app_photo_key.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\app\app_photo_key.c</FilePath>
@@ -1075,6 +1075,16 @@
               <FileName>app_settings.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\app\app_settings.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_own_service.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\app\app_own_service.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_profile.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\app\app_profile.c</FilePath>
             </File>
           </Files>
         </Group>

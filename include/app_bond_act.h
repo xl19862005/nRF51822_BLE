@@ -2,11 +2,17 @@
 #define _APP_BOND_ACT_H
 #include "app_board.h"
 
+#define BLE_ACT_MAX_DATA_LEN (GATT_MTU_SIZE_DEFAULT - 3) /**< Maximum length of data (in bytes) that can be transmitted to the peer by the Nordic UART service module. */
+
 //action service
-#define ACTION_SERVECE_UUID				0xAA01
+#define ACTION_SERVICE_UUID				0xAA01
 #define RANDOM_CHARACTERISTIC_UUID	0xBB01
 #define VERIFY_CHARACTERISTIC_UUID    0xBB02
 #define ANTILOST_CHARACTERISTIC_UUID	0XBB03 	
+
+/**@brief 128-bit UUID base List. */
+#define  OWN_BASE_128UUID {{0x23, 0xD1, 0xBC, 0xEA, 0x5F, 0x78, 0x23, 0x15,0xDE, 0xEF, 0x12, 0x12, 0x00, 0x00, 0x00, 0x00}};
+
 
 //ble bond act. codes
 typedef enum{
@@ -17,6 +23,11 @@ typedef enum{
 typedef struct ble_action_service ble_action_service_t;
 
 typedef void(*ble_bond_action_handler_t)(ble_action_service_t * p_action, uint8_t * p_data, uint16_t length);
+
+typedef struct
+{
+    ble_bond_action_handler_t data_handler; /**< Event handler to be called for handling received data. */
+} ble_bond_action_init_t;
 
 /**@brief Xandy add own(action) service structure.
  *
@@ -29,10 +40,11 @@ struct ble_action_service
     ble_gatts_char_handles_t random_handles;              /**< Handles related to the random numbers get. */
     ble_gatts_char_handles_t verify_handles;              /**< Handles related to the verify. */
     ble_gatts_char_handles_t antlost_handles;              /**< Handles related to the ANT lost. */
-	uint16_t                 conn_handle;             /**< Handle of the current connection (as provided by the S110 SoftDevice). BLE_CONN_HANDLE_INVALID if not in a connection. */
-    bool                     is_notification_enabled; /**< Variable to indicate if the peer has enabled notification of the RX characteristic.*/
     ble_bond_action_handler_t   data_handler;            /**< Event handler to be called for handling received data. */
+	uint16_t  						conn_handle;             /**< Handle of the current connection (as provided by the S110 SoftDevice). BLE_CONN_HANDLE_INVALID if not in a connection. */
+	bool                     is_notification_enabled; /**< Variable to indicate if the peer has enabled notification of the RX characteristic.*/
 };
 
+void ble_watch_action_on_ble_evt(ble_action_service_t * p_action, ble_evt_t * p_ble_evt);
 void ble_bond_action_process(int len);
 #endif

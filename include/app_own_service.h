@@ -3,4 +3,5 @@
 #include "app_board.h"
 
 
+void app_own_service_init(void);
 #endif
