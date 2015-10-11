@@ -3,6 +3,7 @@
 extern app_uart_buffer_t uart_rx;
 extern own_manuf_data_t manuf_data;
 extern ble_action_service_t m_action;
+extern watch_action_t m_watch;
 
 static void watch_on_connect(ble_action_service_t * p_action, ble_evt_t * p_ble_evt)
 {
@@ -77,27 +78,28 @@ void ble_watch_action_on_ble_evt(ble_action_service_t * p_action, ble_evt_t * p_
     }
 }
 
-static uint32_t random_char_add(ble_action_service_t * p_action)
+static uint32_t add_char(uint16_t uuid, 
+								  uint8_t uuid_type, 
+								  const ble_gatts_char_md_t *p_char_md, 
+								  uint16_t service_handle, 
+								  ble_gatts_char_handles_t *p_char_handle)
 {
-	ble_gatts_char_md_t char_md;
+	ble_gatts_attr_md_t cccd_md;
 	ble_gatts_attr_t	attr_char_value;
 	ble_uuid_t			ble_uuid;
 	ble_gatts_attr_md_t attr_md;
 
-	memset(&char_md, 0, sizeof(char_md));
+	memset(&cccd_md, 0, sizeof(cccd_md));
+	
+	BLE_GAP_CONN_SEC_MODE_SET_OPEN(&cccd_md.read_perm);
+	BLE_GAP_CONN_SEC_MODE_SET_OPEN(&cccd_md.write_perm);
+	cccd_md.vloc = BLE_GATTS_VLOC_STACK;
 
-	char_md.char_props.read		 = 1;
-	char_md.p_char_user_desc		 = NULL;
-	char_md.p_char_pf				 = NULL;
-	char_md.p_user_desc_md			 = NULL;
-	char_md.p_cccd_md				 = NULL;
-	char_md.p_sccd_md				 = NULL;
-
-	ble_uuid.type = p_action->uuid_type;
-	ble_uuid.uuid = RANDOM_CHARACTERISTIC_UUID;
+	ble_uuid.type = uuid_type;
+	ble_uuid.uuid = uuid;
 
 	memset(&attr_md, 0, sizeof(attr_md));
-
+	
 	BLE_GAP_CONN_SEC_MODE_SET_OPEN(&attr_md.read_perm);
 	BLE_GAP_CONN_SEC_MODE_SET_OPEN(&attr_md.write_perm);
 
@@ -110,14 +112,35 @@ static uint32_t random_char_add(ble_action_service_t * p_action)
 
 	attr_char_value.p_uuid	  = &ble_uuid;
 	attr_char_value.p_attr_md = &attr_md;
-	attr_char_value.init_len  = 1;
+	attr_char_value.init_len  = sizeof(uint8_t);
 	attr_char_value.init_offs = 0;
 	attr_char_value.max_len   = BLE_ACT_MAX_DATA_LEN;
 
-	return sd_ble_gatts_characteristic_add(p_action->service_handle,
-										   &char_md,
-										   &attr_char_value,
-										   &p_action->random_handles);
+	return sd_ble_gatts_characteristic_add(service_handle,p_char_md,&attr_char_value,p_char_handle);
+}
+
+
+
+static uint32_t random_char_add(ble_action_service_t * p_action)
+{
+	ble_gatts_char_md_t char_md;
+
+	int i;
+
+	memset(&char_md, 0, sizeof(ble_gatts_char_md_t));
+
+	char_md.char_props.read = 1;
+	char_md.p_char_user_desc  = NULL;
+	char_md.p_char_pf		  = NULL;
+	char_md.p_user_desc_md	  = NULL;
+	char_md.p_cccd_md		  = NULL;
+	char_md.p_sccd_md		  = NULL;
+	
+	add_char(RANDOM_CHARACTERISTIC_UUID, 
+				 p_action->uuid_type, 
+				 &char_md, 
+				 p_action->service_handle, 
+				 &p_action->random_handles);
 }
 
 
@@ -125,56 +148,26 @@ static uint32_t random_char_add(ble_action_service_t * p_action)
 static uint32_t verify_char_add(ble_action_service_t * p_action)
 {
 	ble_gatts_char_md_t char_md;
-	ble_gatts_attr_md_t cccd_md;
-	ble_gatts_attr_t	attr_char_value;
-	ble_uuid_t			ble_uuid;
-	ble_gatts_attr_md_t attr_md;
 
-	memset(&cccd_md, 0, sizeof(cccd_md));
+	memset(&char_md, 0, sizeof(ble_gatts_char_md_t));
 
-	BLE_GAP_CONN_SEC_MODE_SET_OPEN(&cccd_md.read_perm);
-	BLE_GAP_CONN_SEC_MODE_SET_OPEN(&cccd_md.write_perm);
-
-	cccd_md.vloc = BLE_GATTS_VLOC_STACK;
-
-	memset(&char_md, 0, sizeof(char_md));
-
-	char_md.char_props.notify = 1;
+	char_md.char_props.read = 1;
+	char_md.char_props.write = 1;
+	char_md.char_props.write_wo_resp = 1;
 	char_md.p_char_user_desc  = NULL;
 	char_md.p_char_pf		  = NULL;
 	char_md.p_user_desc_md	  = NULL;
-	char_md.p_cccd_md		  = &cccd_md;
+	char_md.p_cccd_md		  = NULL;
 	char_md.p_sccd_md		  = NULL;
-
-	ble_uuid.type = p_action->uuid_type;
-	ble_uuid.uuid = VERIFY_CHARACTERISTIC_UUID;
-
-	memset(&attr_md, 0, sizeof(attr_md));
-
-	BLE_GAP_CONN_SEC_MODE_SET_OPEN(&attr_md.read_perm);
-	BLE_GAP_CONN_SEC_MODE_SET_OPEN(&attr_md.write_perm);
-
-	attr_md.vloc	= BLE_GATTS_VLOC_STACK;
-	attr_md.rd_auth = 0;
-	attr_md.wr_auth = 0;
-	attr_md.vlen	= 1;
-
-	memset(&attr_char_value, 0, sizeof(attr_char_value));
-
-	attr_char_value.p_uuid	  = &ble_uuid;
-	attr_char_value.p_attr_md = &attr_md;
-	attr_char_value.init_len  = sizeof(uint8_t);
-	attr_char_value.init_offs = 0;
-	attr_char_value.max_len   = BLE_ACT_MAX_DATA_LEN;
-
-	return sd_ble_gatts_characteristic_add(p_action->service_handle,
-										   &char_md,
-										   &attr_char_value,
-										   &p_action->verify_handles);
+	
+	add_char(VERIFY_CHARACTERISTIC_UUID, 
+				 p_action->uuid_type, 
+				 &char_md, 
+				 p_action->service_handle, 
+				 &p_action->random_handles);
 }
 
-
-static uint32_t link_check_service_init(ble_action_service_t * p_action, const ble_bond_action_init_t *p_action_init)
+uint32_t watch_action_service_init(ble_action_service_t * p_action, const ble_bond_action_init_t *p_action_init)
 {
     uint32_t      err_code;
     ble_uuid_t    ble_uuid;
@@ -185,13 +178,16 @@ static uint32_t link_check_service_init(ble_action_service_t * p_action, const b
 	p_action->data_handler = p_action_init->data_handler;
 	p_action->is_notification_enabled = false;
 
-	//binding service
-	ble_uuid.uuid = ACTION_SERVICE_UUID;
-	err_code = sd_ble_uuid_vs_add(&nus_base_uuid, &ble_uuid.type);
+	//action service
+	err_code = sd_ble_uuid_vs_add(&nus_base_uuid, &p_action->uuid_type);
     if(err_code != NRF_SUCCESS)
     {
 		return err_code;
 	}
+
+    ble_uuid.type = p_action->uuid_type;
+    ble_uuid.uuid = ACTION_SERVICE_UUID;
+
 
     // Add the service.
     err_code = sd_ble_gatts_service_add(BLE_GATTS_SRVC_TYPE_PRIMARY,
@@ -203,19 +199,120 @@ static uint32_t link_check_service_init(ble_action_service_t * p_action, const b
 	}
 	
 	//RANDOM_CHARACTERISTIC_UUID //watch write
-	//err_code = random_char_add(p_action); 
+	err_code = random_char_add(p_action); 
     if(err_code != NRF_SUCCESS)
     {
 		return err_code;
 	}
 	
 	//VERIFY_CHARACTERISTIC_UUID	//phone write
-	//err_code = verify_char_add(p_action);
+	err_code = verify_char_add(p_action);
     
 	return err_code;
 }
 
-static void action_data_handler(ble_action_service_t * p_action, uint8_t * p_data, uint16_t length)
+uint32_t server_key_char_add(ble_binding_t * p_binding)
+{
+	ble_gatts_char_md_t char_md;
+
+	memset(&char_md, 0, sizeof(ble_gatts_char_md_t));
+
+	char_md.char_props.read = 1;
+	char_md.char_props.write = 1;
+	char_md.char_props.write_wo_resp = 1;
+	char_md.p_char_user_desc  = NULL;
+	char_md.p_char_pf		  = NULL;
+	char_md.p_user_desc_md	  = NULL;
+	char_md.p_cccd_md		  = NULL;
+	char_md.p_sccd_md		  = NULL;
+	
+	add_char(SERVER_KEY_CHARACTERISTIC_UUID, 
+				 p_binding->uuid_type, 
+				 &char_md, 
+				 p_binding->service_handle, 
+				 &p_binding->server_key_handles);
+}
+
+uint32_t watch_key_char_add(ble_binding_t * p_binding)
+{
+	ble_gatts_char_md_t char_md;
+
+	memset(&char_md, 0, sizeof(ble_gatts_char_md_t));
+
+	char_md.char_props.read = 1;
+	char_md.p_char_user_desc  = NULL;
+	char_md.p_char_pf		  = NULL;
+	char_md.p_user_desc_md	  = NULL;
+	char_md.p_cccd_md		  = NULL;
+	char_md.p_sccd_md		  = NULL;
+	
+	add_char(WATCH_KEY_CHARACTERISTIC_UUID, 
+				 p_binding->uuid_type, 
+				 &char_md, 
+				 p_binding->service_handle, 
+				 &p_binding->server_key_handles);
+}
+
+uint32_t binding_service_init(ble_binding_t * p_binding, const ble_binding_init_t *p_binding_init)
+{
+    uint32_t      err_code;
+    ble_uuid_t    ble_uuid;
+    ble_uuid128_t nus_base_uuid = OWN_BASE_128UUID;
+
+	//p_binding->conn_handle = p_action_init->conn_handler;
+	p_binding->conn_handle = BLE_CONN_HANDLE_INVALID;
+	p_binding->data_handler = p_binding_init->data_handler;
+	p_binding->is_notification_enabled = false;
+
+	//binding service
+	err_code = sd_ble_uuid_vs_add(&nus_base_uuid, &p_binding->uuid_type);
+    if(err_code != NRF_SUCCESS)
+    {
+		return err_code;
+	}
+
+    ble_uuid.type = p_binding->uuid_type;
+    ble_uuid.uuid = BINDING_SERVICE_UUID;
+
+
+    // Add the service.
+    err_code = sd_ble_gatts_service_add(BLE_GATTS_SRVC_TYPE_PRIMARY,
+                                        &ble_uuid,
+                                        &p_binding->service_handle);
+    if(err_code != NRF_SUCCESS)
+    {
+		return err_code;
+	}
+	
+	//SERVER_KEY_CHARACTERISTIC_UUID //phone write
+	err_code = server_key_char_add(p_binding); 
+    if(err_code != NRF_SUCCESS)
+    {
+		return err_code;
+	}
+	
+	//WATCH_KEY_CHARACTERISTIC_UUID	//watch write
+	err_code = watch_key_char_add(p_binding);
+    
+	return err_code;
+}
+
+
+void watch_action_data_handler(ble_action_service_t * p_action, uint8_t * p_data, uint16_t length)
+{
+	app_uart_buffer_t* pbf = &uart_rx;
+	uint8_t random_data[6];
+	int i;
+
+	for(i=0;i<6;i++)
+	{
+		random_data[i] = uart_buffer_pull_data(pbf->iget,NO_CRC);
+	}
+
+	p_data = random_data;
+} 
+
+void watch_binding_data_handler(ble_binding_t * p_binding, uint8_t * p_data, uint16_t length)
 {
 
 }
@@ -224,8 +321,7 @@ void ble_bond_action_process(int len)
 {
     uint32_t      err_code;
 	app_uart_buffer_t* pbf = &uart_rx;
-	ble_bond_action_init_t action_init;
-	ble_nus_init_t nus_init;
+	//ble_nus_init_t nus_init;
 	ble_bond_act_status_t code = uart_buffer_pull_data(pbf->iget,NO_CRC);
 
 	printf("ble_bond_action_process: code=0x%x,iget=%d,iput=%d\n",code,pbf->iget,pbf->iput);
@@ -236,9 +332,7 @@ void ble_bond_action_process(int len)
 		manuf_data.binding_status = code;
 		if(BLE_BOND_ACT_ENTER)
 		{
-			action_init.data_handler = action_data_handler;
-			//err_code = link_check_service_init(&m_action, &action_init);
-           // APP_ERROR_CHECK(err_code);
+			m_watch.action.data_len = len - 2; //device + code 2 bytes
 			app_advertising_restart(100, 0, BLE_GAP_ADV_TYPE_ADV_IND, &manuf_data);
 		}
 		else

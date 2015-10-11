@@ -6,6 +6,8 @@ static ble_gap_adv_params_t     	   m_adv_params;
 
 ble_action_service_t m_action;
 own_manuf_data_t manuf_data;
+watch_action_t m_watch;
+
 bool is_advertising_start = false;
 
 /**@brief Function for the Application's S110 SoftDevice event handler.
@@ -277,11 +279,20 @@ void app_advertising_stop()
 
 void app_advertising_restart(uint32_t adv_interval_ms, uint32_t adv_timeout_sec, uint8_t adv_type, own_manuf_data_t* p_manuf_data)
 {
+	uint32_t err_code;
+	ble_bond_action_init_t action_init;
+	ble_binding_init_t binding_init;
+
 	if(adv_type == BLE_GAP_ADV_TYPE_ADV_NONCONN_IND)
 	{
 		non_connectable_adv_init(adv_interval_ms, adv_timeout_sec);
 	}else if(adv_type == BLE_GAP_ADV_TYPE_ADV_IND)
 	{
+		action_init.data_handler  = watch_action_data_handler;
+		binding_init.data_handler = watch_binding_data_handler;
+		err_code = app_own_service_init(&m_watch, &action_init, &binding_init);
+		APP_ERROR_CHECK(err_code);
+		
 		connectable_adv_init(adv_interval_ms, adv_timeout_sec);
 	}
 
