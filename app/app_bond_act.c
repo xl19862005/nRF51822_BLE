@@ -329,7 +329,7 @@ void ble_bond_action_process(int len)
 	{
 		//BLE_BOND_ACT_ENTER set the adv as a connect adv
 		app_advertising_stop();
-		manuf_data.binding_status = code;
+ 		manuf_data.binding_status = code;
 		if(BLE_BOND_ACT_ENTER)
 		{
 			m_watch.action.data_len = len - 2; //device + code 2 bytes

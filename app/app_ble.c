@@ -7,7 +7,17 @@ static ble_gap_adv_params_t     	   m_adv_params;
 ble_action_service_t m_action;
 own_manuf_data_t manuf_data;
 
-bool is_advertising_start = false;
+static bool is_advertising_start = false;
+
+/**@brief Function for starting advertising.
+ */
+static void advertising_start(void)
+{
+    uint32_t err_code;
+    
+    err_code = sd_ble_gap_adv_start(&m_adv_params);
+    APP_ERROR_CHECK(err_code);
+}
 
 /**@brief Function for the Application's S110 SoftDevice event handler.
  *
@@ -23,15 +33,17 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
 			err_code = bsp_indication_set(BSP_INDICATE_CONNECTED);
             APP_ERROR_CHECK(err_code);
             m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
-			printf("Some one connected!\n");
+			is_advertising_start = false;
+			LOG_INFO("Some one connected!\n");
             break;
             
         case BLE_GAP_EVT_DISCONNECTED:
 			err_code = bsp_indication_set(BSP_INDICATE_IDLE);
             APP_ERROR_CHECK(err_code);
             m_conn_handle = BLE_CONN_HANDLE_INVALID;
-			app_advertising_restart(100, 0, BLE_GAP_ADV_TYPE_ADV_NONCONN_IND, &manuf_data);
-			printf("Some one disconnected!\n");
+			advertising_start();
+			is_advertising_start = true;
+			LOG_INFO("Some one disconnected!\n");
             break;
 
         case BLE_GAP_EVT_SEC_PARAMS_REQUEST:
@@ -248,16 +260,6 @@ static void non_connectable_adv_init(uint32_t adv_interval_ms, uint32_t adv_time
     m_adv_params.timeout     = adv_timeout_sec;
 }
 
-/**@brief Function for starting advertising.
- */
-static void advertising_start(void)
-{
-    uint32_t err_code;
-    
-    err_code = sd_ble_gap_adv_start(&m_adv_params);
-    APP_ERROR_CHECK(err_code);
-}
-
 void app_advertising_stop()
 {
     uint32_t      err_code;
@@ -265,10 +267,12 @@ void app_advertising_stop()
 	if(m_conn_handle != BLE_CONN_HANDLE_INVALID)
 	{
 		err_code = sd_ble_gap_disconnect(m_conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
-		APP_ERROR_CHECK(err_code);
-	}
-
-	if(is_advertising_start)
+		if (err_code != NRF_ERROR_INVALID_STATE)
+		{
+			APP_ERROR_CHECK(err_code);
+		}
+		
+	}else if(is_advertising_start)
 	{
 		err_code = sd_ble_gap_adv_stop();
 		APP_ERROR_CHECK(err_code);
@@ -280,18 +284,25 @@ void app_advertising_restart(uint32_t adv_interval_ms, uint32_t adv_timeout_sec,
 {
 	uint32_t err_code;
 
+
 	if(adv_type == BLE_GAP_ADV_TYPE_ADV_NONCONN_IND)
 	{
 		non_connectable_adv_init(adv_interval_ms, adv_timeout_sec);
 	}else if(adv_type == BLE_GAP_ADV_TYPE_ADV_IND)
 	{		
 		connectable_adv_init(adv_interval_ms, adv_timeout_sec);
-	}
+	} 
 
 	advertising_data_init(p_manuf_data);
-	advertising_start();
-	is_advertising_start = true;
+
+	if(m_conn_handle == BLE_CONN_HANDLE_INVALID)
+	{
+		advertising_start();
+		is_advertising_start = true;
+	}
 }
+
+//sd_ble_gap_rssi_start
 
 void app_ble_init(void)
 {
@@ -304,4 +315,5 @@ void app_ble_init(void)
 	APP_ERROR_CHECK(err_code);
 
 	app_advertising_restart(100, 0, BLE_GAP_ADV_TYPE_ADV_NONCONN_IND, &manuf_data);
+	is_advertising_start = true;
 }
