@@ -26,11 +26,11 @@ typedef enum{
 }ble_bond_act_status_t;
 
 typedef struct ble_action_service ble_action_service_t;
-typedef struct ble_binding_service ble_binding_t;
+typedef struct ble_binding_service ble_binding_service_t;
 
 
 typedef void(*ble_bond_action_handler_t)(ble_action_service_t * p_action, uint8_t * p_data, uint16_t length);
-typedef void(*ble_binding_handler_t)(ble_binding_t * p_binding, uint8_t * p_data, uint16_t length);
+typedef void(*ble_binding_handler_t)(ble_binding_service_t * p_binding, uint8_t * p_data, uint16_t length);
 
 typedef struct
 {
@@ -57,7 +57,6 @@ struct ble_action_service
     ble_bond_action_handler_t   data_handler;            /**< Event handler to be called for handling received data. */
 	uint16_t  						conn_handle;             /**< Handle of the current connection (as provided by the S110 SoftDevice). BLE_CONN_HANDLE_INVALID if not in a connection. */
 	bool                     is_notification_enabled; /**< Variable to indicate if the peer has enabled notification of the RX characteristic.*/
-	uint8_t	data_len;
 };
 
 /**@brief Xandy add own(binding) service structure.
@@ -78,12 +77,12 @@ struct ble_binding_service
 typedef struct watch_action
 {
 	ble_action_service_t action;
-	ble_binding_t	binding;
+	ble_binding_service_t	binding;
 }watch_action_t;
 
-void watch_binding_data_handler(ble_binding_t * p_binding, uint8_t * p_data, uint16_t length);
+void watch_binding_data_handler(ble_binding_service_t * p_binding, uint8_t * p_data, uint16_t length);
 void watch_action_data_handler(ble_action_service_t * p_action, uint8_t * p_data, uint16_t length);
 uint32_t watch_action_service_init(ble_action_service_t * p_action, const ble_bond_action_init_t *p_action_init);
-uint32_t binding_service_init(ble_binding_t * p_binding, const ble_binding_init_t *p_binding_init);
+uint32_t binding_service_init(ble_binding_service_t * p_binding, const ble_binding_init_t *p_binding_init);
 void ble_bond_action_process(int len);
 #endif

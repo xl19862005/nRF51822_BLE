@@ -5,55 +5,96 @@ extern own_manuf_data_t manuf_data;
 extern ble_action_service_t m_action;
 extern watch_action_t m_watch;
 
-static void watch_on_connect(ble_action_service_t * p_action, ble_evt_t * p_ble_evt)
+static void watch_on_connect(watch_action_t * p_watch, ble_evt_t * p_ble_evt)
 {
-    p_action->conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
+	p_watch->action.conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
+    p_watch->binding.conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
 }
 
 
-static void watch_on_disconnect(ble_action_service_t * p_action, ble_evt_t * p_ble_evt)
+static void watch_on_disconnect(watch_action_t * p_watch, ble_evt_t * p_ble_evt)
 {
     UNUSED_PARAMETER(p_ble_evt);
-    p_action->conn_handle = BLE_CONN_HANDLE_INVALID;
+	p_watch->action.conn_handle = BLE_CONN_HANDLE_INVALID;
+    p_watch->binding.conn_handle = BLE_CONN_HANDLE_INVALID;
 }
 
-
-static void watch_on_write(ble_action_service_t * p_action, ble_evt_t * p_ble_evt)
+static void watch_action_on_write(ble_action_service_t * p_action, ble_evt_t * p_ble_evt)
 {
     ble_gatts_evt_write_t * p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
 
-    if (
-        (p_evt_write->handle == p_action->verify_handles.cccd_handle)
-        &&
-        (p_evt_write->len == 2)
-       )
-    {
-        if (ble_srv_is_notification_enabled(p_evt_write->data))
-        {
-            p_action->is_notification_enabled = true;
-        }
-        else
-        {
-            p_action->is_notification_enabled = false;
-        }
-    }
-    else if (
-             (p_evt_write->handle == p_action->random_handles.value_handle)
-             &&
-             (p_action->data_handler != NULL)
-            )
-    {
-        p_action->data_handler(p_action, p_evt_write->data, p_evt_write->len);
-    }
-    else
-    {
-        // Do Nothing. This event is not relevant for this service.
-    }
+	if (
+		(p_evt_write->handle == p_action->random_handles.cccd_handle)
+		&&
+		(p_evt_write->len == 2)
+	   )
+	{
+		if (ble_srv_is_notification_enabled(p_evt_write->data))
+		{
+			p_action->is_notification_enabled = true;
+		}
+		else
+		{
+			p_action->is_notification_enabled = false;
+		}
+	}
+	else if (
+			 (p_evt_write->handle == p_action->verify_handles.value_handle)
+			 &&
+			 (p_action->data_handler != NULL)
+			)
+	{
+		p_action->data_handler(p_action, p_evt_write->data, p_evt_write->len);
+	}
+	else
+	{
+		// Do Nothing. This event is not relevant for this service.
+	}
 }
 
-void ble_watch_action_on_ble_evt(ble_action_service_t * p_action, ble_evt_t * p_ble_evt)
+static void watch_binding_on_write(ble_binding_service_t * p_binding, ble_evt_t * p_ble_evt)
 {
-    if ((p_action == NULL) || (p_ble_evt == NULL))
+	ble_gatts_evt_write_t * p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
+
+	if (
+		(p_evt_write->handle == p_binding->watch_key_handles.cccd_handle)
+		&&
+		(p_evt_write->len == 2)
+	   )
+	{
+		if (ble_srv_is_notification_enabled(p_evt_write->data))
+		{
+			p_binding->is_notification_enabled = true;
+		}
+		else
+		{
+			p_binding->is_notification_enabled = false;
+		}
+	}
+	else if (
+			 (p_evt_write->handle == p_binding->server_key_handles.value_handle)
+			 &&
+			 (p_binding->data_handler != NULL)
+			)
+	{
+		p_binding->data_handler(p_binding, p_evt_write->data, p_evt_write->len);
+	}
+	else
+	{
+		// Do Nothing. This event is not relevant for this service.
+	}
+}
+
+static void watch_on_write(watch_action_t * p_watch, ble_evt_t * p_ble_evt)
+{
+	watch_action_on_write(&p_watch->action, p_ble_evt);
+	watch_binding_on_write(&p_watch->binding, p_ble_evt);
+	
+}
+
+void ble_watch_action_on_ble_evt(watch_action_t * p_watch, ble_evt_t * p_ble_evt)
+{
+    if ((p_watch == NULL) || (p_ble_evt == NULL))
     {
         return;
     }
@@ -61,15 +102,15 @@ void ble_watch_action_on_ble_evt(ble_action_service_t * p_action, ble_evt_t * p_
     switch (p_ble_evt->header.evt_id)
     {
         case BLE_GAP_EVT_CONNECTED:
-            watch_on_connect(p_action, p_ble_evt);
+            watch_on_connect(p_watch, p_ble_evt);
             break;
 
         case BLE_GAP_EVT_DISCONNECTED:
-            watch_on_disconnect(p_action, p_ble_evt);
+            watch_on_disconnect(p_watch, p_ble_evt);
             break;
 
         case BLE_GATTS_EVT_WRITE:
-            watch_on_write(p_action, p_ble_evt);
+            watch_on_write(p_watch, p_ble_evt);
             break;
 
         default:
@@ -211,7 +252,7 @@ uint32_t watch_action_service_init(ble_action_service_t * p_action, const ble_bo
 	return err_code;
 }
 
-uint32_t server_key_char_add(ble_binding_t * p_binding)
+uint32_t server_key_char_add(ble_binding_service_t * p_binding)
 {
 	ble_gatts_char_md_t char_md;
 
@@ -233,7 +274,7 @@ uint32_t server_key_char_add(ble_binding_t * p_binding)
 				 &p_binding->server_key_handles);
 }
 
-uint32_t watch_key_char_add(ble_binding_t * p_binding)
+uint32_t watch_key_char_add(ble_binding_service_t * p_binding)
 {
 	ble_gatts_char_md_t char_md;
 
@@ -253,7 +294,7 @@ uint32_t watch_key_char_add(ble_binding_t * p_binding)
 				 &p_binding->server_key_handles);
 }
 
-uint32_t binding_service_init(ble_binding_t * p_binding, const ble_binding_init_t *p_binding_init)
+uint32_t binding_service_init(ble_binding_service_t * p_binding, const ble_binding_init_t *p_binding_init)
 {
     uint32_t      err_code;
     ble_uuid_t    ble_uuid;
@@ -312,7 +353,7 @@ void watch_action_data_handler(ble_action_service_t * p_action, uint8_t * p_data
 	p_data = random_data;
 } 
 
-void watch_binding_data_handler(ble_binding_t * p_binding, uint8_t * p_data, uint16_t length)
+void watch_binding_data_handler(ble_binding_service_t * p_binding, uint8_t * p_data, uint16_t length)
 {
 
 }
@@ -328,16 +369,22 @@ void ble_bond_action_process(int len)
 	if((code == BLE_BOND_ACT_EXIT)|| (code == BLE_BOND_ACT_ENTER))
 	{
 		//BLE_BOND_ACT_ENTER set the adv as a connect adv
-		app_advertising_stop();
- 		manuf_data.binding_status = code;
-		if(BLE_BOND_ACT_ENTER)
+		if(manuf_data.binding_status == code)
 		{
-			m_watch.action.data_len = len - 2; //device + code 2 bytes
-			app_advertising_restart(100, 0, BLE_GAP_ADV_TYPE_ADV_IND, &manuf_data);
+			//add send data to the char
 		}
 		else
 		{
-			app_advertising_restart(100, 0, BLE_GAP_ADV_TYPE_ADV_NONCONN_IND, &manuf_data);
+			app_advertising_stop();
+	 		manuf_data.binding_status = code;
+			if(BLE_BOND_ACT_ENTER)
+			{
+				app_advertising_restart(100, 0, BLE_GAP_ADV_TYPE_ADV_IND, &manuf_data);
+			}
+			else
+			{
+				app_advertising_restart(100, 0, BLE_GAP_ADV_TYPE_ADV_NONCONN_IND, &manuf_data);
+			}
 		}
 	}
 }

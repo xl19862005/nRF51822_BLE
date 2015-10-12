@@ -4,8 +4,6 @@ extern uint16_t                         m_conn_handle;
 extern watch_action_t m_watch;
 
 static ble_gap_adv_params_t     	   m_adv_params;  
-
-ble_action_service_t m_action;
 own_manuf_data_t manuf_data;
 
 static bool is_advertising_start = false;
@@ -83,7 +81,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
 static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 {
     on_ble_evt(p_ble_evt);
-	ble_watch_action_on_ble_evt(&m_action, p_ble_evt);
+	ble_watch_action_on_ble_evt(&m_watch, p_ble_evt);
 }
 
 /**@brief Function for dispatching a system event to interested modules.
