@@ -106,7 +106,7 @@ static uint16_t crc16_check(int iget, uint16_t data_length, crc_type type)
 		}/*end for*/
 	}/*end if*/
 
-	printf("get crc = 0x%x\n",crc);
+	//printf("get crc = 0x%x\n",crc);
 	return crc;
 }
 

@@ -338,19 +338,89 @@ uint32_t binding_service_init(ble_binding_service_t * p_binding, const ble_bindi
 	return err_code;
 }
 
+static uint32_t ble_action_data_send(ble_action_service_t * p_action, uint8_t * p_data, uint16_t length)
+{
+	ble_gatts_hvx_params_t hvx_params;
+
+	if ((p_action->conn_handle == BLE_CONN_HANDLE_INVALID) || (!p_action->is_notification_enabled))
+	{
+		return NRF_ERROR_INVALID_STATE;
+	}
+
+	return 0;
+
+	if (length > BLE_NUS_MAX_DATA_LEN)
+	{
+		return NRF_ERROR_INVALID_PARAM;
+	}
+
+	memset(&hvx_params, 0, sizeof(hvx_params));
+
+	hvx_params.handle = p_action->random_handles.value_handle;
+	hvx_params.p_data = p_data;
+	hvx_params.p_len  = &length;
+	hvx_params.type   = BLE_GATT_HVX_NOTIFICATION;
+
+	return sd_ble_gatts_hvx(p_action->conn_handle, &hvx_params);
+}
+
+
+static uint32_t ble_binding_data_send(ble_binding_service_t * p_binding, uint8_t * p_data, uint16_t length)
+{
+	ble_gatts_hvx_params_t hvx_params;
+
+	if ((p_binding->conn_handle == BLE_CONN_HANDLE_INVALID) || (!p_binding->is_notification_enabled))
+	{
+		return NRF_ERROR_INVALID_STATE;
+	}
+
+	if (length > BLE_NUS_MAX_DATA_LEN)
+	{
+		return NRF_ERROR_INVALID_PARAM;
+	}
+
+	memset(&hvx_params, 0, sizeof(hvx_params));
+
+	hvx_params.handle = p_binding->watch_key_handles.value_handle;
+	hvx_params.p_data = p_data;
+	hvx_params.p_len  = &length;
+	hvx_params.type   = BLE_GATT_HVX_NOTIFICATION;
+
+	return sd_ble_gatts_hvx(p_binding->conn_handle, &hvx_params);
+}
+
+
+uint32_t ble_watch_data_send(watch_action_t * p_watch, const app_uart_buffer_t* pbf, uint16_t length)
+{
+	int i;
+	uint32_t err_code;
+	uint8_t data[20];
+
+    if (p_watch == NULL)
+    {
+        return NRF_ERROR_NULL;
+    }
+
+	memset(data,0,20);
+
+	for(i=0;i<length;i++)
+	{
+		data[i] = uart_buffer_pull_data(pbf->iget,NO_CRC);
+	}
+
+	err_code = ble_action_data_send(&p_watch->action, data, length);
+    APP_ERROR_CHECK(err_code);
+	
+	//err_code = ble_binding_data_send(&p_watch->binding, data, length);
+    //APP_ERROR_CHECK(err_code);
+
+	return err_code;
+}
 
 void watch_action_data_handler(ble_action_service_t * p_action, uint8_t * p_data, uint16_t length)
 {
-	app_uart_buffer_t* pbf = &uart_rx;
-	uint8_t random_data[6];
-	int i;
-
-	for(i=0;i<6;i++)
-	{
-		random_data[i] = uart_buffer_pull_data(pbf->iget,NO_CRC);
-	}
-
-	p_data = random_data;
+	
+	//app_uart_tx_buffer_push(BLE_BOND_ACT_STATUS, BLE_BOND_ACT_ENTER);
 } 
 
 void watch_binding_data_handler(ble_binding_service_t * p_binding, uint8_t * p_data, uint16_t length)
@@ -380,6 +450,8 @@ void ble_bond_action_process(int len)
 			if(BLE_BOND_ACT_ENTER)
 			{
 				app_advertising_restart(100, 0, BLE_GAP_ADV_TYPE_ADV_IND, &manuf_data);
+				m_watch.action.is_notification_enabled = true;
+				ble_watch_data_send(&m_watch, pbf, len-2);
 			}
 			else
 			{
