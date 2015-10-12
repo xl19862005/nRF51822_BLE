@@ -23,11 +23,10 @@ static void watch_action_on_write(ble_action_service_t * p_action, ble_evt_t * p
 {
     ble_gatts_evt_write_t * p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
 
-	if (
-		(p_evt_write->handle == p_action->random_handles.cccd_handle)
-		&&
-		(p_evt_write->len == 2)
-	   )
+	printf("whandle=0x%x, cccd_handle=0x%x, len=%d, vhandle=0x%x\n",p_evt_write->handle,
+																								p_action->random_handles.cccd_handle,
+																								p_evt_write->len,p_action->verify_handles.value_handle);
+	if ((p_evt_write->handle == p_action->random_handles.cccd_handle)&&(p_evt_write->len == 2))
 	{
 		if (ble_srv_is_notification_enabled(p_evt_write->data))
 		{
@@ -38,16 +37,13 @@ static void watch_action_on_write(ble_action_service_t * p_action, ble_evt_t * p
 			p_action->is_notification_enabled = false;
 		}
 	}
-	else if (
-			 (p_evt_write->handle == p_action->verify_handles.value_handle)
-			 &&
-			 (p_action->data_handler != NULL)
-			)
+	else if ((p_evt_write->handle == p_action->verify_handles.value_handle)&&(p_action->data_handler != NULL))
 	{
 		p_action->data_handler(p_action, p_evt_write->data, p_evt_write->len);
 	}
 	else
 	{
+		printf("A3333\n"); 
 		// Do Nothing. This event is not relevant for this service.
 	}
 }
@@ -56,11 +52,10 @@ static void watch_binding_on_write(ble_binding_service_t * p_binding, ble_evt_t 
 {
 	ble_gatts_evt_write_t * p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
 
-	if (
-		(p_evt_write->handle == p_binding->watch_key_handles.cccd_handle)
-		&&
-		(p_evt_write->len == 2)
-	   )
+	printf("whandle=0x%x, cccd_handle=0x%x, len=%d, vhandle=0x%x\n",p_evt_write->handle,
+																								p_binding->watch_key_handles.cccd_handle,
+																								p_evt_write->len,p_binding->server_key_handles.value_handle);
+	if ((p_evt_write->handle == p_binding->watch_key_handles.cccd_handle)&&(p_evt_write->len == 2))
 	{
 		if (ble_srv_is_notification_enabled(p_evt_write->data))
 		{
@@ -71,16 +66,13 @@ static void watch_binding_on_write(ble_binding_service_t * p_binding, ble_evt_t 
 			p_binding->is_notification_enabled = false;
 		}
 	}
-	else if (
-			 (p_evt_write->handle == p_binding->server_key_handles.value_handle)
-			 &&
-			 (p_binding->data_handler != NULL)
-			)
+	else if ((p_evt_write->handle == p_binding->server_key_handles.value_handle)&&(p_binding->data_handler != NULL))
 	{
 		p_binding->data_handler(p_binding, p_evt_write->data, p_evt_write->len);
 	}
 	else
 	{
+		printf("B3333\n"); 
 		// Do Nothing. This event is not relevant for this service.
 	}
 }
@@ -110,6 +102,7 @@ void ble_watch_action_on_ble_evt(watch_action_t * p_watch, ble_evt_t * p_ble_evt
             break;
 
         case BLE_GATTS_EVT_WRITE:
+			printf("ble on write!\n");
             watch_on_write(p_watch, p_ble_evt);
             break;
 
@@ -160,8 +153,6 @@ static uint32_t add_char(uint16_t uuid,
 	return sd_ble_gatts_characteristic_add(service_handle,p_char_md,&attr_char_value,p_char_handle);
 }
 
-
-
 static uint32_t random_char_add(ble_action_service_t * p_action)
 {
 	ble_gatts_char_md_t char_md;
@@ -170,7 +161,7 @@ static uint32_t random_char_add(ble_action_service_t * p_action)
 
 	memset(&char_md, 0, sizeof(ble_gatts_char_md_t));
 
-	char_md.char_props.read = 1;
+	char_md.char_props.notify = 1;
 	char_md.p_char_user_desc  = NULL;
 	char_md.p_char_pf		  = NULL;
 	char_md.p_user_desc_md	  = NULL;
@@ -280,7 +271,7 @@ uint32_t watch_key_char_add(ble_binding_service_t * p_binding)
 
 	memset(&char_md, 0, sizeof(ble_gatts_char_md_t));
 
-	char_md.char_props.read = 1;
+	char_md.char_props.notify = 1;
 	char_md.p_char_user_desc  = NULL;
 	char_md.p_char_pf		  = NULL;
 	char_md.p_user_desc_md	  = NULL;
@@ -408,8 +399,8 @@ uint32_t ble_watch_data_send(watch_action_t * p_watch, const app_uart_buffer_t* 
 		data[i] = uart_buffer_pull_data(pbf->iget,NO_CRC);
 	}
 
-	err_code = ble_action_data_send(&p_watch->action, data, length);
-    APP_ERROR_CHECK(err_code);
+	//err_code = ble_action_data_send(&p_watch->action, data, length);
+    //APP_ERROR_CHECK(err_code);
 	
 	//err_code = ble_binding_data_send(&p_watch->binding, data, length);
     //APP_ERROR_CHECK(err_code);
@@ -419,7 +410,12 @@ uint32_t ble_watch_data_send(watch_action_t * p_watch, const app_uart_buffer_t* 
 
 void watch_action_data_handler(ble_action_service_t * p_action, uint8_t * p_data, uint16_t length)
 {
-	
+	int i;
+
+	for(i=0;i<length;i++)
+	{
+		printf("0x%x ",p_data[i]);
+	}
 	//app_uart_tx_buffer_push(BLE_BOND_ACT_STATUS, BLE_BOND_ACT_ENTER);
 } 
 
@@ -450,8 +446,7 @@ void ble_bond_action_process(int len)
 			if(BLE_BOND_ACT_ENTER)
 			{
 				app_advertising_restart(100, 0, BLE_GAP_ADV_TYPE_ADV_IND, &manuf_data);
-				m_watch.action.is_notification_enabled = true;
-				ble_watch_data_send(&m_watch, pbf, len-2);
+				//ble_watch_data_send(&m_watch, pbf, len-2);
 			}
 			else
 			{
