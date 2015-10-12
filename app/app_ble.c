@@ -1,6 +1,7 @@
 #include "app_ble.h"
 
 extern uint16_t                         m_conn_handle;
+extern watch_action_t m_watch;
 
 static ble_gap_adv_params_t     	   m_adv_params;  
 
@@ -17,6 +18,7 @@ static void advertising_start(void)
     
     err_code = sd_ble_gap_adv_start(&m_adv_params);
     APP_ERROR_CHECK(err_code);
+	is_advertising_start = true;
 }
 
 /**@brief Function for the Application's S110 SoftDevice event handler.
@@ -42,7 +44,6 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
             APP_ERROR_CHECK(err_code);
             m_conn_handle = BLE_CONN_HANDLE_INVALID;
 			advertising_start();
-			is_advertising_start = true;
 			LOG_INFO("Some one disconnected!\n");
             break;
 
@@ -298,7 +299,6 @@ void app_advertising_restart(uint32_t adv_interval_ms, uint32_t adv_timeout_sec,
 	if(m_conn_handle == BLE_CONN_HANDLE_INVALID)
 	{
 		advertising_start();
-		is_advertising_start = true;
 	}
 }
 
@@ -315,5 +315,4 @@ void app_ble_init(void)
 	APP_ERROR_CHECK(err_code);
 
 	app_advertising_restart(100, 0, BLE_GAP_ADV_TYPE_ADV_NONCONN_IND, &manuf_data);
-	is_advertising_start = true;
 }

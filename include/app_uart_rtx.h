@@ -44,7 +44,6 @@ typedef struct{
 	uart_rx_cb cb;
 }app_uart_rx_cb_t;
 
-void app_uart_tx_buffer_push(int device, int code, const uint8_t* data, int len);
 void uart_buffer_push_data(uint8_t data);
 uint8_t uart_buffer_pull_data(int iget, crc_type type);
 void app_uart_evt_analyse(void);
