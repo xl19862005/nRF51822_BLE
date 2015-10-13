@@ -25,10 +25,10 @@ uint32_t connected_evt_handle(ble_evt_t * p_ble_evt)
 	
 	err_code = bsp_indication_set(BSP_INDICATE_CONNECTED);
 	APP_ERROR_CHECK(err_code);
+	
 	m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
 	is_advertising_start = false;
-	LOG_INFO("Some one connected!\n");
-
+	app_device_connected_status_handler(p_ble_evt, DEVICE_CONNECTED);
 	return err_code;
 }
 
@@ -39,12 +39,10 @@ uint32_t disconnected_evt_handle(ble_evt_t * p_ble_evt)
 	err_code = bsp_indication_set(BSP_INDICATE_IDLE);
 	APP_ERROR_CHECK(err_code);
 	m_conn_handle = BLE_CONN_HANDLE_INVALID;
-	//manuf_data.binding_status = 0; //start a timer to count the link time
-	//advertising_start();
+
+	app_device_connected_status_handler(p_ble_evt, DEVICE_DISCONNECTED);
 	app_advertising_restart(100, 0, BLE_GAP_ADV_TYPE_ADV_NONCONN_IND, &manuf_data);
 	
-	LOG_INFO("Some one disconnected!\n");
-
 	return err_code;
 }
 

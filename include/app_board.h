@@ -24,6 +24,7 @@
 #include "app_device_code.h"
 #include "app_watch_lock.h"
 #include "app_bond_act.h"
+#include "app_device_conn.h"
 
 #define APP_TIMER_PRESCALER             0                                           /**< Value of the RTC1 PRESCALER register. */
 #define APP_TIMER_MAX_TIMERS            (2 + BSP_APP_TIMERS_NUMBER)                 /**< Maximum number of simultaneously created timers. */

@@ -154,7 +154,7 @@ static void send_evt_package(app_uart_send_buffer_t *psb)
 	psb->buffer[psb->iput++] = crc & 0x00FF;
 }
 
-void app_uart_tx_buffer_push(ble_device_t device, ble_bond_act_status_t code, const uint8_t* data, int len)
+void app_uart_tx_buffer_push(ble_device_t device, int code, const uint8_t* data, int len)
 {
 	app_uart_send_buffer_t	 *psb = &uart_tx;
 
