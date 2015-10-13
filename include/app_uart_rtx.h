@@ -44,10 +44,14 @@ typedef struct{
 	uart_rx_cb cb;
 }app_uart_rx_cb_t;
 
+//uart send data
+void app_uart_evt_send(void);
+void app_uart_tx_buffer_push(ble_device_t device, int code, const uint8_t* data, int len);
+
+//uart receive data
+void app_uart_rtx_init(void);
+void app_uart_evt_analyse(void);
 void uart_buffer_push_data(uint8_t data);
 uint8_t uart_buffer_pull_data(int iget, crc_type type);
-void app_uart_evt_analyse(void);
-void app_uart_evt_send(void);
-void app_uart_rtx_init(void);
 void get_uart_data(app_uart_buffer_t* rx);
 #endif

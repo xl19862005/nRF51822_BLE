@@ -171,11 +171,11 @@ static uint32_t random_char_add(ble_action_service_t * p_action)
 	char_md.p_cccd_md		  = NULL;
 	char_md.p_sccd_md		  = NULL;
 	
-	add_char(RANDOM_CHARACTERISTIC_UUID, 
-				 p_action->uuid_type, 
-				 &char_md, 
-				 p_action->service_handle, 
-				 &p_action->random_handles);
+	return add_char(RANDOM_CHARACTERISTIC_UUID, 
+							 p_action->uuid_type, 
+							 &char_md, 
+							 p_action->service_handle, 
+							 &p_action->random_handles);
 }
 
 
@@ -195,11 +195,11 @@ static uint32_t verify_char_add(ble_action_service_t * p_action)
 	char_md.p_cccd_md		  = NULL;
 	char_md.p_sccd_md		  = NULL;
 	
-	add_char(VERIFY_CHARACTERISTIC_UUID, 
-				 p_action->uuid_type, 
-				 &char_md, 
-				 p_action->service_handle, 
-				 &p_action->verify_handles);
+	return add_char(VERIFY_CHARACTERISTIC_UUID, 
+							 p_action->uuid_type, 
+							 &char_md, 
+							 p_action->service_handle, 
+							 &p_action->verify_handles);
 }
 
 uint32_t watch_action_service_init(ble_action_service_t * p_action, const ble_bond_action_init_t *p_action_init)
@@ -352,7 +352,7 @@ static uint32_t watch_imei_data_send(watch_action_t * p_watch, const app_uart_bu
 
 	gatts_value.len = BLE_ACT_MAX_DATA_LEN;
 	gatts_value.offset= 0;
-	gatts_value.p_value = random_data;
+	gatts_value.p_value = data;
 	return sd_ble_gatts_value_set(p_watch->action.conn_handle, p_watch->action.random_handles.value_handle, &gatts_value);
 }
 

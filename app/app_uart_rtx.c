@@ -135,8 +135,6 @@ static void send_evt_package(app_uart_send_buffer_t *psb)
 	int i;
 	uint16_t crc;
 
-	psb->isBusy = true;
-
 	//add head
 	psb->buffer[0] = CMD_HEAD0;
 	psb->buffer[1] = CMD_HEAD1;
@@ -191,7 +189,7 @@ void app_uart_evt_send(void)
 			
 		}
 
-		memset(&uart_tx, 0, sizeof(app_uart_send_buffer_t));
+		memset(psb, 0, sizeof(app_uart_send_buffer_t));
 	}
 }
 
@@ -209,7 +207,7 @@ void app_uart_evt_analyse(void)
 	//in same condition iput or iget will biger than MAX value?
 	if((iput > MAX_RING_BUFFER_SIZE) || (iget > MAX_RING_BUFFER_SIZE))
 	{
-		app_uart_rtx_init();
+		memset(pbf, 0, sizeof(app_uart_buffer_t));
 		return;
 	}
 

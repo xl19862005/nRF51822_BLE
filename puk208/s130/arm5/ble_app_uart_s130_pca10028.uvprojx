@@ -526,6 +526,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\app\app_profile.c</FilePath>
             </File>
+            <File>
+              <FileName>app_device_conn.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\app\app_device_conn.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1085,6 +1090,11 @@
               <FileName>app_profile.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\app\app_profile.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_device_conn.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\app\app_device_conn.c</FilePath>
             </File>
           </Files>
         </Group>
