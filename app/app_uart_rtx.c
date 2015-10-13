@@ -117,7 +117,6 @@ static void device_cmd_dispatch()
 	int len = uart_buffer_pull_data(pbf->iget,NO_CRC);
 	ble_device_t device = uart_buffer_pull_data(pbf->iget,NO_CRC);
 
-	printf("device_cmd_dispatch: len=%d,device=0x%x\n",len,device);
 	if((device >= BLE_WATCH_LOCK_STATUS) && (device < BLE_ENUM_END))
 	{
 		rx_cb[device].cb(len);
@@ -246,7 +245,7 @@ void app_uart_evt_analyse(void)
 				else
 				{
 					app_uart_rtx_init();
-					printf("crc check error(crc=0x%x)!\n",crc);
+					LOG_DEBUG("crc check error(crc=0x%x)!\n",crc);
 				}
 			}
 			else//one package cmd is not full

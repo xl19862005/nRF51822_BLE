@@ -41,7 +41,7 @@ uint32_t disconnected_evt_handle(ble_evt_t * p_ble_evt)
 	m_conn_handle = BLE_CONN_HANDLE_INVALID;
 
 	app_device_connected_status_handler(p_ble_evt, DEVICE_DISCONNECTED);
-	app_advertising_restart(100, 0, BLE_GAP_ADV_TYPE_ADV_NONCONN_IND, &manuf_data);
+	//app_advertising_restart(100, 0, BLE_GAP_ADV_TYPE_ADV_NONCONN_IND, &manuf_data);
 	
 	return err_code;
 }
@@ -305,6 +305,8 @@ void app_advertising_restart(uint32_t adv_interval_ms, uint32_t adv_timeout_sec,
 
 	if(adv_type == BLE_GAP_ADV_TYPE_ADV_NONCONN_IND)
 	{
+		//non_connectable adv,must set the binding status to 0
+		p_manuf_data->binding_status = 0;
 		non_connectable_adv_init(adv_interval_ms, adv_timeout_sec);
 	}else if(adv_type == BLE_GAP_ADV_TYPE_ADV_IND)
 	{		
@@ -323,7 +325,7 @@ void app_advertising_restart(uint32_t adv_interval_ms, uint32_t adv_timeout_sec,
 
 void app_ble_init(void)
 {
-    uint32_t      err_code;
+    uint32_t      err_code; 
 
 	ble_stack_init();
 	gap_params_init();

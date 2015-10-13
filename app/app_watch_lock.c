@@ -10,8 +10,6 @@ void watch_lock_status_process(int len)
 
 	ble_lock_watch_status_t code = uart_buffer_pull_data(pbf->iget,NO_CRC);
 
-	printf("watch_lock_status_process: code=0x%x,iget=%d,iput=%d\n",code,pbf->iget,pbf->iput);
-
 	if((code == BLE_WATCH_UNLOCK)|| (code == BLE_WATCH_LOCKED))
 	{
 		app_advertising_stop();

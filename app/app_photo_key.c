@@ -9,7 +9,6 @@ void ble_photo_key_status_process(int len)
 
 	ble_photo_key_status_t code = uart_buffer_pull_data(pbf->iget,NO_CRC);
 
-	printf("code=0x%x,iget=%d,iput=%d\n",code,pbf->iget,pbf->iput);
 	if((code == BLE_PHOTO_KEY_DISABLE)|| (code == BLE_PHOTO_KEY_ENABLE))
 	{
 		app_advertising_stop();

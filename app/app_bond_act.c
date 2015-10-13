@@ -413,14 +413,12 @@ void ble_bond_action_process(int len)
 {
     uint32_t      err_code;
 	app_uart_buffer_t* pbf = &uart_rx;
-	//ble_nus_init_t nus_init;
 	ble_bond_act_status_t code = uart_buffer_pull_data(pbf->iget,NO_CRC);
 
-	printf("ble_bond_action_process: code=0x%x,iget=%d,iput=%d\n",code,pbf->iget,pbf->iput);
 	if((code == BLE_BOND_ACT_EXIT)|| (code == BLE_BOND_ACT_ENTER))
 	{
 		//BLE_BOND_ACT_ENTER set the adv as a connect adv
-		if(manuf_data.binding_status == code)
+		if((manuf_data.binding_status == code) && (code == BLE_BOND_ACT_ENTER))
 		{
 			//add send data to the char
 		}
