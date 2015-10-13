@@ -5,10 +5,18 @@ extern own_manuf_data_t manuf_data;
 extern ble_action_service_t m_action;
 extern watch_action_t m_watch;
 
+static uint8_t random_data[WATCH_RANDOM_DATA_LEN] = {0};
 static void watch_on_connect(watch_action_t * p_watch, ble_evt_t * p_ble_evt)
 {
+	ble_gatts_value_t gatts_value;
+
 	p_watch->action.conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
     p_watch->binding.conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
+	
+	gatts_value.len = WATCH_RANDOM_DATA_LEN;
+	gatts_value.offset= 0;
+	gatts_value.p_value = random_data;
+	sd_ble_gatts_value_set(p_watch->action.conn_handle, p_watch->action.random_handles.value_handle, &gatts_value);
 }
 
 
@@ -107,7 +115,8 @@ static uint32_t add_char(uint16_t uuid,
 								  uint8_t uuid_type, 
 								  const ble_gatts_char_md_t *p_char_md, 
 								  uint16_t service_handle, 
-								  ble_gatts_char_handles_t *p_char_handle)
+								  ble_gatts_char_handles_t *p_char_handle,
+								  uint8_t max_len)
 {
 	ble_gatts_attr_md_t cccd_md;
 	ble_gatts_attr_t	attr_char_value;
@@ -139,7 +148,7 @@ static uint32_t add_char(uint16_t uuid,
 	attr_char_value.p_attr_md = &attr_md;
 	attr_char_value.init_len  = sizeof(uint8_t);
 	attr_char_value.init_offs = 0;
-	attr_char_value.max_len   = BLE_ACT_MAX_DATA_LEN;
+	attr_char_value.max_len   = max_len;
 
 	return sd_ble_gatts_characteristic_add(service_handle,p_char_md,&attr_char_value,p_char_handle);
 }
@@ -152,7 +161,7 @@ static uint32_t random_char_add(ble_action_service_t * p_action)
 
 	memset(&char_md, 0, sizeof(ble_gatts_char_md_t));
 
-	char_md.char_props.notify = 1;
+	char_md.char_props.read = 1;
 	char_md.p_char_user_desc  = NULL;
 	char_md.p_char_pf		  = NULL;
 	char_md.p_user_desc_md	  = NULL;
@@ -163,7 +172,8 @@ static uint32_t random_char_add(ble_action_service_t * p_action)
 				 p_action->uuid_type, 
 				 &char_md, 
 				 p_action->service_handle, 
-				 &p_action->random_handles);
+				 &p_action->random_handles,
+				 WATCH_RANDOM_DATA_LEN);
 }
 
 
@@ -187,7 +197,8 @@ static uint32_t verify_char_add(ble_action_service_t * p_action)
 				 p_action->uuid_type, 
 				 &char_md, 
 				 p_action->service_handle, 
-				 &p_action->verify_handles);
+				 &p_action->verify_handles,
+				 4);
 }
 
 uint32_t watch_action_service_init(ble_action_service_t * p_action, const ble_bond_action_init_t *p_action_init)
@@ -253,7 +264,8 @@ uint32_t server_key_char_add(ble_binding_service_t * p_binding)
 				 p_binding->uuid_type, 
 				 &char_md, 
 				 p_binding->service_handle, 
-				 &p_binding->server_key_handles);
+				 &p_binding->server_key_handles,
+				 BLE_ACT_MAX_DATA_LEN);
 }
 
 uint32_t watch_key_char_add(ble_binding_service_t * p_binding)
@@ -262,7 +274,7 @@ uint32_t watch_key_char_add(ble_binding_service_t * p_binding)
 
 	memset(&char_md, 0, sizeof(ble_gatts_char_md_t));
 
-	char_md.char_props.notify = 1;
+	char_md.char_props.read = 1;
 	char_md.p_char_user_desc  = NULL;
 	char_md.p_char_pf		  = NULL;
 	char_md.p_user_desc_md	  = NULL;
@@ -273,7 +285,8 @@ uint32_t watch_key_char_add(ble_binding_service_t * p_binding)
 				 p_binding->uuid_type, 
 				 &char_md, 
 				 p_binding->service_handle, 
-				 &p_binding->watch_key_handles);
+				 &p_binding->watch_key_handles,
+				 BLE_ACT_MAX_DATA_LEN);
 }
 
 uint32_t binding_service_init(ble_binding_service_t * p_binding, const ble_binding_init_t *p_binding_init)
@@ -411,6 +424,7 @@ void watch_binding_data_handler(ble_binding_service_t * p_binding, uint8_t * p_d
 
 void ble_bond_action_process(int len)
 {
+	int i;
     uint32_t      err_code;
 	app_uart_buffer_t* pbf = &uart_rx;
 	ble_bond_act_status_t code = uart_buffer_pull_data(pbf->iget,NO_CRC);
@@ -420,7 +434,8 @@ void ble_bond_action_process(int len)
 		//BLE_BOND_ACT_ENTER set the adv as a connect adv
 		if((manuf_data.binding_status == code) && (code == BLE_BOND_ACT_ENTER))
 		{
-			//add send data to the char
+			//link check OK,send IMEI to phone
+			
 		}
 		else
 		{
@@ -428,8 +443,11 @@ void ble_bond_action_process(int len)
 	 		manuf_data.binding_status = code;
 			if(BLE_BOND_ACT_ENTER)
 			{
+				for(i=0;i<len-2;i++)
+				{
+					random_data[i] = uart_buffer_pull_data(pbf->iget,NO_CRC);
+				}
 				app_advertising_restart(100, 0, BLE_GAP_ADV_TYPE_ADV_IND, &manuf_data);
-				//ble_watch_data_send(&m_watch, pbf, len-2);
 			}
 			else
 			{

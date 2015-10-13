@@ -41,7 +41,7 @@ uint32_t disconnected_evt_handle(ble_evt_t * p_ble_evt)
 	m_conn_handle = BLE_CONN_HANDLE_INVALID;
 
 	app_device_connected_status_handler(p_ble_evt, DEVICE_DISCONNECTED);
-	//app_advertising_restart(100, 0, BLE_GAP_ADV_TYPE_ADV_NONCONN_IND, &manuf_data);
+	app_advertising_restart(100, 0, BLE_GAP_ADV_TYPE_ADV_NONCONN_IND, &manuf_data);
 	
 	return err_code;
 }

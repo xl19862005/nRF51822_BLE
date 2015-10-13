@@ -3,6 +3,9 @@
 //#include "app_board.h"
 #include "app_uart_rtx.h"
 
+//the length of watch random data(in bytes) 
+#define WATCH_RANDOM_DATA_LEN		6
+
 #define BLE_ACT_MAX_DATA_LEN (GATT_MTU_SIZE_DEFAULT - 3) /**< Maximum length of data (in bytes) that can be transmitted to the peer by the Nordic UART service module. */
 
 /**@brief 128-bit UUID base List. */
