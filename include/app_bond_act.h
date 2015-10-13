@@ -22,7 +22,8 @@
 //ble bond act. codes
 typedef enum{
 	BLE_BOND_ACT_EXIT = 0x00,
-	BLE_BOND_ACT_ENTER
+	BLE_BOND_ACT_ENTER,
+	BLE_BOND_ACT_SUCESS
 }ble_bond_act_status_t;
 
 typedef struct ble_action_service ble_action_service_t;

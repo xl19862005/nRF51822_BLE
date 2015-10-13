@@ -401,24 +401,13 @@ uint32_t ble_watch_data_send(watch_action_t * p_watch, const app_uart_buffer_t* 
 
 void watch_action_data_handler(ble_action_service_t * p_action, uint8_t * p_data, uint16_t length)
 {
-	int i;
-
-	for(i=0;i<length;i++)
-	{
-		printf("0x%x \n",p_data[i]);
-	}
-	//app_uart_tx_buffer_push(BLE_BOND_ACT_STATUS, BLE_BOND_ACT_ENTER);
+	app_uart_tx_buffer_push(BLE_BOND_ACT_STATUS, BLE_BOND_ACT_ENTER, p_data, length);
 } 
 
 void watch_binding_data_handler(ble_binding_service_t * p_binding, uint8_t * p_data, uint16_t length)
 {
-	int i;
-
-	for(i=0;i<length;i++)
-	{
-		printf("0x%x \n",p_data[i]);
-	}
-}
+	app_uart_tx_buffer_push(BLE_BOND_ACT_STATUS, BLE_BOND_ACT_SUCESS, p_data, length);
+} 
 
 void ble_bond_action_process(int len)
 {

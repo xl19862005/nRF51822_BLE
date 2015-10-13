@@ -150,8 +150,8 @@ static void send_evt_package(app_uart_send_buffer_t *psb)
 
 	//add crc 2 bytes
 	crc = crc16_check(0, psb->iput, CRC_SEND_GEN);
-	psb->buffer[psb->iput++] = (crc | 0xFF00) >> 8;
-	psb->buffer[psb->iput++] = crc | 0x00FF;
+	psb->buffer[psb->iput++] = (crc & 0xFF00) >> 8;
+	psb->buffer[psb->iput++] = crc & 0x00FF;
 }
 
 void app_uart_tx_buffer_push(ble_device_t device, ble_bond_act_status_t code, const uint8_t* data, int len)
