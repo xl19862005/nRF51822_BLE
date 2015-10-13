@@ -23,9 +23,6 @@ static void watch_action_on_write(ble_action_service_t * p_action, ble_evt_t * p
 {
     ble_gatts_evt_write_t * p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
 
-	printf("whandle=0x%x, cccd_handle=0x%x, len=%d, vhandle=0x%x\n",p_evt_write->handle,
-																								p_action->random_handles.cccd_handle,
-																								p_evt_write->len,p_action->verify_handles.value_handle);
 	if ((p_evt_write->handle == p_action->random_handles.cccd_handle)&&(p_evt_write->len == 2))
 	{
 		if (ble_srv_is_notification_enabled(p_evt_write->data))
@@ -43,7 +40,6 @@ static void watch_action_on_write(ble_action_service_t * p_action, ble_evt_t * p
 	}
 	else
 	{
-		printf("A3333\n"); 
 		// Do Nothing. This event is not relevant for this service.
 	}
 }
@@ -52,9 +48,6 @@ static void watch_binding_on_write(ble_binding_service_t * p_binding, ble_evt_t 
 {
 	ble_gatts_evt_write_t * p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
 
-	printf("whandle=0x%x, cccd_handle=0x%x, len=%d, vhandle=0x%x\n",p_evt_write->handle,
-																								p_binding->watch_key_handles.cccd_handle,
-																								p_evt_write->len,p_binding->server_key_handles.value_handle);
 	if ((p_evt_write->handle == p_binding->watch_key_handles.cccd_handle)&&(p_evt_write->len == 2))
 	{
 		if (ble_srv_is_notification_enabled(p_evt_write->data))
@@ -72,7 +65,6 @@ static void watch_binding_on_write(ble_binding_service_t * p_binding, ble_evt_t 
 	}
 	else
 	{
-		printf("B3333\n"); 
 		// Do Nothing. This event is not relevant for this service.
 	}
 }
@@ -102,7 +94,6 @@ void ble_watch_action_on_ble_evt(watch_action_t * p_watch, ble_evt_t * p_ble_evt
             break;
 
         case BLE_GATTS_EVT_WRITE:
-			printf("ble on write!\n");
             watch_on_write(p_watch, p_ble_evt);
             break;
 
@@ -196,7 +187,7 @@ static uint32_t verify_char_add(ble_action_service_t * p_action)
 				 p_action->uuid_type, 
 				 &char_md, 
 				 p_action->service_handle, 
-				 &p_action->random_handles);
+				 &p_action->verify_handles);
 }
 
 uint32_t watch_action_service_init(ble_action_service_t * p_action, const ble_bond_action_init_t *p_action_init)
@@ -282,7 +273,7 @@ uint32_t watch_key_char_add(ble_binding_service_t * p_binding)
 				 p_binding->uuid_type, 
 				 &char_md, 
 				 p_binding->service_handle, 
-				 &p_binding->server_key_handles);
+				 &p_binding->watch_key_handles);
 }
 
 uint32_t binding_service_init(ble_binding_service_t * p_binding, const ble_binding_init_t *p_binding_init)
@@ -414,14 +405,19 @@ void watch_action_data_handler(ble_action_service_t * p_action, uint8_t * p_data
 
 	for(i=0;i<length;i++)
 	{
-		printf("0x%x ",p_data[i]);
+		printf("0x%x \n",p_data[i]);
 	}
 	//app_uart_tx_buffer_push(BLE_BOND_ACT_STATUS, BLE_BOND_ACT_ENTER);
 } 
 
 void watch_binding_data_handler(ble_binding_service_t * p_binding, uint8_t * p_data, uint16_t length)
 {
+	int i;
 
+	for(i=0;i<length;i++)
+	{
+		printf("0x%x \n",p_data[i]);
+	}
 }
 
 void ble_bond_action_process(int len)
