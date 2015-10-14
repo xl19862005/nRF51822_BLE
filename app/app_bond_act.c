@@ -6,7 +6,7 @@ extern ble_action_service_t m_action;
 extern watch_action_t m_watch;
 
 static uint8_t random_data[BLE_ACT_MAX_DATA_LEN] = {0};
-static void watch_random_char_set(watch_action_t * p_watch)
+static void watch_random_char_set(watch_action_t* const p_watch)
 {
 	ble_gatts_value_t gatts_value;
 
@@ -16,7 +16,7 @@ static void watch_random_char_set(watch_action_t * p_watch)
 	sd_ble_gatts_value_set(p_watch->action.conn_handle, p_watch->action.random_handles.value_handle, &gatts_value);
 }
 
-static void watch_on_connect(watch_action_t * p_watch, ble_evt_t * p_ble_evt)
+static void watch_on_connect(watch_action_t* const p_watch, ble_evt_t* p_ble_evt)
 {
 	p_watch->action.conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
     p_watch->binding.conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
@@ -24,14 +24,14 @@ static void watch_on_connect(watch_action_t * p_watch, ble_evt_t * p_ble_evt)
 }
 
 
-static void watch_on_disconnect(watch_action_t * p_watch, ble_evt_t * p_ble_evt)
+static void watch_on_disconnect(watch_action_t* const p_watch, ble_evt_t* const p_ble_evt)
 {
     UNUSED_PARAMETER(p_ble_evt);
 	p_watch->action.conn_handle = BLE_CONN_HANDLE_INVALID;
     p_watch->binding.conn_handle = BLE_CONN_HANDLE_INVALID;
 }
 
-static void watch_action_on_write(ble_action_service_t * p_action, ble_evt_t * p_ble_evt)
+static void watch_action_on_write(ble_action_service_t* const p_action, ble_evt_t* p_ble_evt)
 {
     ble_gatts_evt_write_t * p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
 
@@ -56,7 +56,7 @@ static void watch_action_on_write(ble_action_service_t * p_action, ble_evt_t * p
 	}
 }
 
-static void watch_binding_on_write(ble_binding_service_t * p_binding, ble_evt_t * p_ble_evt)
+static void watch_binding_on_write(ble_binding_service_t* const p_binding, ble_evt_t* p_ble_evt)
 {
 	ble_gatts_evt_write_t * p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
 
@@ -81,14 +81,14 @@ static void watch_binding_on_write(ble_binding_service_t * p_binding, ble_evt_t 
 	}
 }
 
-static void watch_on_write(watch_action_t * p_watch, ble_evt_t * p_ble_evt)
+static void watch_on_write(watch_action_t* const p_watch, ble_evt_t* p_ble_evt)
 {
 	watch_action_on_write(&p_watch->action, p_ble_evt);
 	watch_binding_on_write(&p_watch->binding, p_ble_evt);
 	
 }
 
-void ble_watch_action_on_ble_evt(watch_action_t * p_watch, ble_evt_t * p_ble_evt)
+void ble_watch_action_on_ble_evt(watch_action_t* const p_watch, ble_evt_t* p_ble_evt)
 {
     if ((p_watch == NULL) || (p_ble_evt == NULL))
     {
@@ -117,9 +117,9 @@ void ble_watch_action_on_ble_evt(watch_action_t * p_watch, ble_evt_t * p_ble_evt
 
 static uint32_t add_char(uint16_t uuid, 
 								  uint8_t uuid_type, 
-								  const ble_gatts_char_md_t *p_char_md, 
+								  const ble_gatts_char_md_t* p_char_md, 
 								  uint16_t service_handle, 
-								  ble_gatts_char_handles_t *p_char_handle)
+								  ble_gatts_char_handles_t* p_char_handle)
 {
 	ble_gatts_attr_md_t cccd_md;
 	ble_gatts_attr_t	attr_char_value;
@@ -156,7 +156,7 @@ static uint32_t add_char(uint16_t uuid,
 	return sd_ble_gatts_characteristic_add(service_handle,p_char_md,&attr_char_value,p_char_handle);
 }
 
-static uint32_t random_char_add(ble_action_service_t * p_action)
+static uint32_t random_char_add(ble_action_service_t* const p_action)
 {
 	ble_gatts_char_md_t char_md;
 
@@ -180,7 +180,7 @@ static uint32_t random_char_add(ble_action_service_t * p_action)
 
 
 
-static uint32_t verify_char_add(ble_action_service_t * p_action)
+static uint32_t verify_char_add(ble_action_service_t* const p_action)
 {
 	ble_gatts_char_md_t char_md;
 
@@ -202,7 +202,7 @@ static uint32_t verify_char_add(ble_action_service_t * p_action)
 							 &p_action->verify_handles);
 }
 
-uint32_t watch_action_service_init(ble_action_service_t * p_action, const ble_bond_action_init_t *p_action_init)
+uint32_t watch_action_service_init(ble_action_service_t* const p_action, const ble_bond_action_init_t *p_action_init)
 {
     uint32_t      err_code;
     ble_uuid_t    ble_uuid;
@@ -246,7 +246,7 @@ uint32_t watch_action_service_init(ble_action_service_t * p_action, const ble_bo
 	return err_code;
 }
 
-uint32_t server_key_char_add(ble_binding_service_t * p_binding)
+uint32_t server_key_char_add(ble_binding_service_t* const p_binding)
 {
 	ble_gatts_char_md_t char_md;
 
@@ -268,7 +268,7 @@ uint32_t server_key_char_add(ble_binding_service_t * p_binding)
 				 &p_binding->server_key_handles);
 }
 
-uint32_t watch_key_char_add(ble_binding_service_t * p_binding)
+uint32_t watch_key_char_add(ble_binding_service_t* const p_binding)
 {
 	ble_gatts_char_md_t char_md;
 
@@ -288,7 +288,7 @@ uint32_t watch_key_char_add(ble_binding_service_t * p_binding)
 				 &p_binding->watch_key_handles);
 }
 
-uint32_t binding_service_init(ble_binding_service_t * p_binding, const ble_binding_init_t *p_binding_init)
+uint32_t binding_service_init(ble_binding_service_t* const p_binding, const ble_binding_init_t *p_binding_init)
 {
     uint32_t      err_code;
     ble_uuid_t    ble_uuid;
@@ -332,7 +332,7 @@ uint32_t binding_service_init(ble_binding_service_t * p_binding, const ble_bindi
 	return err_code;
 }
 
-static uint32_t watch_imei_data_send(watch_action_t * p_watch, const app_uart_buffer_t* pbf, uint16_t length)
+static uint32_t watch_imei_data_send(watch_action_t* const p_watch, const app_uart_buffer_t* pbf, uint16_t length)
 {
 	int i;
 	uint32_t err_code;
@@ -356,12 +356,12 @@ static uint32_t watch_imei_data_send(watch_action_t * p_watch, const app_uart_bu
 	return sd_ble_gatts_value_set(p_watch->action.conn_handle, p_watch->action.random_handles.value_handle, &gatts_value);
 }
 
-void watch_action_data_handler(ble_action_service_t * p_action, uint8_t * p_data, uint16_t length)
+void watch_action_data_handler(ble_action_service_t* const p_action, const uint8_t* p_data, uint16_t length)
 {
 	app_uart_tx_buffer_push(BLE_BOND_ACT_STATUS, BLE_BOND_ACT_ENTER, p_data, length);
 } 
 
-void watch_binding_data_handler(ble_binding_service_t * p_binding, uint8_t * p_data, uint16_t length)
+void watch_binding_data_handler(ble_binding_service_t* const p_binding, const uint8_t* p_data, uint16_t length)
 {
 	app_uart_tx_buffer_push(BLE_BOND_ACT_STATUS, BLE_BOND_ACT_SUCESS, p_data, length);
 } 
