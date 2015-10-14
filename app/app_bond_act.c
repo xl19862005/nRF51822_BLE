@@ -373,31 +373,33 @@ void ble_bond_action_process(int len)
 	app_uart_buffer_t* pbf = &uart_rx;
 	ble_bond_act_status_t code = uart_buffer_pull_data(pbf->iget,NO_CRC);
 
-	if((code == BLE_BOND_ACT_EXIT)|| (code == BLE_BOND_ACT_ENTER))
+	if((code >= BLE_BOND_ACT_EXIT) && (code <= BLE_BOND_ACT_SUCESS))
 	{
 		//BLE_BOND_ACT_ENTER set the adv as a connect adv
-		if((manuf_data.binding_status == code) && (code == BLE_BOND_ACT_ENTER))
+		if(code == BLE_BOND_ACT_SUCESS)
 		{
 			//link check OK,send IMEI to phone
 			watch_imei_data_send(&m_watch, pbf, len-2);
 		}
 		else
 		{
-			app_advertising_stop();
-	 		manuf_data.binding_status = code;
-			if(BLE_BOND_ACT_ENTER)
+			if(manuf_data.binding_status != BLE_BOND_ACT_ENTER)
 			{
 				//get the random data
 				for(i=0;i<len-2;i++)
 				{
 					random_data[i] = uart_buffer_pull_data(pbf->iget,NO_CRC);
 				}
+				app_advertising_stop();
 				app_advertising_restart(100, 0, BLE_GAP_ADV_TYPE_ADV_IND, &manuf_data);
 			}
-			else
+			else if(code == BLE_BOND_ACT_EXIT)
 			{
+				app_advertising_stop();
 				app_advertising_restart(100, 0, BLE_GAP_ADV_TYPE_ADV_NONCONN_IND, &manuf_data);
 			}
+			
+	 		manuf_data.binding_status = code;
 		}
 	}
 }
