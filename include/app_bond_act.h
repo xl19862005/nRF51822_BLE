@@ -84,8 +84,8 @@ typedef struct watch_action
 	ble_binding_service_t	binding;
 }watch_action_t;
 
-void watch_binding_data_handler(ble_binding_service_t * p_binding, uint8_t * p_data, uint16_t length);
-void watch_action_data_handler(ble_action_service_t * p_action, uint8_t * p_data, uint16_t length);
+void watch_binding_data_handler(ble_binding_service_t* const p_binding, const uint8_t * p_data, uint16_t length);
+void watch_action_data_handler(ble_action_service_t* const p_action, const uint8_t* p_data, uint16_t length);
 uint32_t watch_action_service_init(ble_action_service_t * p_action, const ble_bond_action_init_t *p_action_init);
 uint32_t binding_service_init(ble_binding_service_t * p_binding, const ble_binding_init_t *p_binding_init);
 void ble_bond_action_process(int len);
