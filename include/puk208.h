@@ -53,6 +53,7 @@
 #define RTS_PIN_NUMBER 8
 #define HWFC           true
 
+#if 0
 #define SPIS_MISO_PIN  20    // SPI MISO signal. 
 #define SPIS_CSN_PIN   21    // SPI CSN signal. 
 #define SPIS_MOSI_PIN  22    // SPI MOSI signal. 
@@ -67,7 +68,7 @@
 #define SPIM1_MOSI_PIN      24u     /**< SPI Master Out Slave In GPIO pin number. */
 #define SPIM1_MISO_PIN      28u     /**< SPI Master In Slave Out GPIO pin number. */
 #define SPIM1_SS_PIN        25u     /**< SPI Slave Select GPIO pin number. */
-
+#endif
 // serialization APPLICATION board
 
 // UART
@@ -85,7 +86,7 @@
 #define SER_APP_SPIM0_SS_PIN        21     // SPI Slave Select GPIO pin number
 #define SER_APP_SPIM0_RDY_PIN       19     // SPI READY GPIO pin number
 #define SER_APP_SPIM0_REQ_PIN       18     // SPI REQUEST GPIO pin number
-#else
+//#else
 #define SER_APP_SPIM0_SCK_PIN       23     // SPI clock GPIO pin number.
 #define SER_APP_SPIM0_MOSI_PIN      20     // SPI Master Out Slave In GPIO pin number
 #define SER_APP_SPIM0_MISO_PIN      22     // SPI Master In Slave Out GPIO pin number
@@ -118,7 +119,7 @@
 #define SER_CON_SPIS_CSN_PIN        21    // SPI CSN signal.
 #define SER_CON_SPIS_RDY_PIN        19     // SPI READY GPIO pin number.
 #define SER_CON_SPIS_REQ_PIN        18     // SPI REQUEST GPIO pin number.
-#else
+//#else
 #define SER_CON_SPIS_SCK_PIN        23    // SPI SCK signal.
 #define SER_CON_SPIS_MOSI_PIN       22    // SPI MOSI signal.
 #define SER_CON_SPIS_MISO_PIN       20    // SPI MISO signal.
@@ -134,4 +135,7 @@
 #define APP_COMPANY_IDENTIFIER			0x004C
 
 #define UART_BUFFER_SIZE			256
+
+//proximity IRQ PIN
+#define PS_IRQ_PIN		29
 #endif

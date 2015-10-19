@@ -4,6 +4,8 @@
 #include <string.h>
 #include "nordic_common.h"
 #include "nrf.h"
+#include "nrf_drv_gpiote.h"
+#include "nrf_gpio.h"
 #include "nrf51_bitfields.h"
 #include "ble_hci.h"
 #include "ble_advdata.h"
@@ -25,6 +27,8 @@
 #include "app_watch_lock.h"
 #include "app_bond_act.h"
 #include "app_device_conn.h"
+#include "hs3000a.h"
+
 
 #define APP_TIMER_PRESCALER             0                                           /**< Value of the RTC1 PRESCALER register. */
 #define APP_TIMER_MAX_TIMERS            (2 + BSP_APP_TIMERS_NUMBER)                 /**< Maximum number of simultaneously created timers. */
