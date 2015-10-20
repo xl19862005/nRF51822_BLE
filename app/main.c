@@ -63,6 +63,8 @@ int main(void)
 
 	//ble stack,gap,service ect. initialize
 	app_ble_init();
+
+    //client_handling_init();
 	    
     printf("Starting...\n");
     

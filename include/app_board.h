@@ -28,6 +28,7 @@
 #include "app_bond_act.h"
 #include "app_device_conn.h"
 #include "hs3000a.h"
+#include "client_handling.h"
 
 
 #define APP_TIMER_PRESCALER             0                                           /**< Value of the RTC1 PRESCALER register. */

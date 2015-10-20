@@ -13,7 +13,7 @@ void ble_photo_key_status_process(int len)
 	{
 		app_advertising_stop();
 		manuf_data.photo_key_press = code;
-		app_advertising_restart(50, 0, BLE_GAP_ADV_TYPE_ADV_NONCONN_IND, &manuf_data);
+		app_advertising_restart(100, 0, BLE_GAP_ADV_TYPE_ADV_NONCONN_IND, &manuf_data);
 	}
 }
 
