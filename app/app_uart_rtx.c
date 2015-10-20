@@ -25,12 +25,6 @@ const app_uart_rx_cb_t rx_cb[BLE_ENUM_END] = {
 	//.
 };
 
-
-void get_uart_data(app_uart_buffer_t* rx)
-{
-	rx = & uart_rx;
-}
-
 void uart_buffer_push_data(uint8_t data)
 {
 	app_uart_buffer_t* pbf = &uart_rx;
