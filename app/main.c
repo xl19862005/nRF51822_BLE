@@ -66,7 +66,7 @@ int main(void)
 
     //client_handling_init();
 	    
-    printf("Starting...\n");
+    //printf("Starting...\n");
     
     // Enter main loop.
     for (;;)

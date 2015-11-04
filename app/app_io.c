@@ -35,15 +35,15 @@ static void bsp_event_handler(bsp_event_t event)
 
 //Xandy add for key event
 		case BSP_EVENT_KEY_0:
-			printf("key 0 press\n");
+			//printf("key 0 press\n");
 			break;
 
 		case BSP_EVENT_KEY_1:
-			printf("key 1 press\n");
+			//printf("key 1 press\n");
 			break;
 
 		case BSP_EVENT_KEY_2:
-			printf("key 2 press\n");
+			//printf("key 2 press\n");
 			break;
 
         default:

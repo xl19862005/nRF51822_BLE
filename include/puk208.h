@@ -47,8 +47,8 @@
 #define BSP_LED_0_MASK    (1<<LED_0)
 #define BSP_LED_1_MASK    (1<<LED_1)
 
-#define RX_PIN_NUMBER  11
-#define TX_PIN_NUMBER  9
+#define RX_PIN_NUMBER  2
+#define TX_PIN_NUMBER  1
 #define CTS_PIN_NUMBER 10
 #define RTS_PIN_NUMBER 8
 #define HWFC           true

@@ -86,8 +86,5 @@ void ble_proximity_process(int len)
 
 	ble_proximity_t code = uart_buffer_pull_data(pbf->iget,NO_CRC);
 
-	//printf("watch_lock_status_process: code=0x%x\n",code);
-	//printf("code=0x%x,iget=%d,iput=%d\n",code,pbf->iget,pbf->iput);
-
 	proximity_on_off(code);
 }

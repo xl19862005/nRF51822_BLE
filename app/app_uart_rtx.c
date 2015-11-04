@@ -149,6 +149,11 @@ void app_uart_tx_buffer_push(ble_device_t device, int code, const uint8_t* data,
 {
 	app_uart_send_buffer_t	 *psb = &uart_tx;
 
+	if(psb->isBusy)
+	{
+		return;
+	}
+
 	psb->buffer[4] = 2 + len;
 	psb->buffer[5] = device;
 	psb->buffer[6] = code;

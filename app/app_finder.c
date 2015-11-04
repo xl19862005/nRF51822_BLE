@@ -9,7 +9,6 @@ void ble_finder_status_process(int len)
 
 	ble_finder_status_t code = uart_buffer_pull_data(pbf->iget,NO_CRC);
 
-	//printf("code=0x%x,iget=%d,iput=%d\n",code,pbf->iget,pbf->iput);
 	if((code == BLE_FINDER_DISABLE)|| (code == BLE_FINDER_ENABLE))
 	{
 		app_advertising_stop();

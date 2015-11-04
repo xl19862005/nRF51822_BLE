@@ -123,8 +123,8 @@ static void ble_stack_init(void)
 {
     uint32_t err_code;
     
-    // Initialize SoftDevice.
-    SOFTDEVICE_HANDLER_INIT(NRF_CLOCK_LFCLKSRC_XTAL_20_PPM, NULL);
+    // Initialize SoftDevice. 
+    SOFTDEVICE_HANDLER_INIT(NRF_CLOCK_LFCLKSRC_RC_250_PPM_2000MS_CALIBRATION, NULL);
 
     // Enable BLE stack.
     ble_enable_params_t ble_enable_params;

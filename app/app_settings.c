@@ -8,7 +8,7 @@ void ble_settings_process(int len)
 
 	ble_settings_t code = uart_buffer_pull_data(pbf->iget,NO_CRC);
 
-	printf("code=0x%x,iget=%d,iput=%d\n",code,pbf->iget,pbf->iput);
+	//printf("code=0x%x,iget=%d,iput=%d\n",code,pbf->iget,pbf->iput);
 	switch(code)
 	{
 		case BLE_RF_DB_SET:
