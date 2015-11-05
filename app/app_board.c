@@ -29,7 +29,8 @@ void uart_event_handle(app_uart_evt_t * p_event)
 
 			//push the uart data to the ring buffer
 			uart_buffer_push_data(data_array[index]);
-			
+			//printf("ble ok\n");
+			 
             index++;   
 
 			if(index >= (BLE_NUS_MAX_DATA_LEN))
@@ -81,5 +82,4 @@ void app_board_init(void)
 {
 	timers_init();
 	uart_init();
-	//twi_master_init();
 }

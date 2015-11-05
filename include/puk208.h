@@ -49,8 +49,8 @@
 
 #define RX_PIN_NUMBER  2
 #define TX_PIN_NUMBER  1
-#define CTS_PIN_NUMBER 10
-#define RTS_PIN_NUMBER 8
+#define CTS_PIN_NUMBER -1
+#define RTS_PIN_NUMBER -1
 #define HWFC           true
 
 #if 0

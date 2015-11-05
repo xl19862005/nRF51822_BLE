@@ -124,7 +124,7 @@ static void ble_stack_init(void)
     uint32_t err_code;
     
     // Initialize SoftDevice. 
-    SOFTDEVICE_HANDLER_INIT(NRF_CLOCK_LFCLKSRC_RC_250_PPM_2000MS_CALIBRATION, NULL);
+    SOFTDEVICE_HANDLER_INIT(NRF_CLOCK_LFCLKSRC_RC_250_PPM_4000MS_CALIBRATION, NULL);
 
     // Enable BLE stack.
     ble_enable_params_t ble_enable_params;
@@ -168,7 +168,7 @@ static void gap_params_init(void)
 	sprintf(device_name,"%s",DEVICE_NAME);
 	for(i=BLE_GAP_ADDR_LEN-1;i>=0;i--)
 	{
-		sprintf(tmp,"%2x",gap_addr.addr[i]);
+		sprintf(tmp,"%02x",gap_addr.addr[i]);
 		strcat(device_name,tmp);
 	}
     
@@ -332,6 +332,6 @@ void app_ble_init(void)
 	manufacture_data_init();
 	err_code = app_own_service_init();
 	APP_ERROR_CHECK(err_code);
-
+ 
 	app_advertising_restart(100, 0, BLE_GAP_ADV_TYPE_ADV_NONCONN_IND, &manuf_data);
 }

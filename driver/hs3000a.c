@@ -45,7 +45,16 @@ static bool hs3000a_write_block(uint8_t* data, uint8_t length)
 
 bool hs3000a_init(void)
 {
-	return hs3000a_write_block((uint8_t*)ps_init_data, sizeof(ps_init_data));
+	int i;
+	bool err;
+	//return hs3000a_write_block((uint8_t*)ps_init_data, sizeof(ps_init_data));
+
+	for(i=0;i<sizeof(ps_init_data);i++)
+	{
+		err &= hs3000a_write(ps_init_data[i].addr, ps_init_data[i].data);
+	}
+
+	return err;
 }
 
 bool hs3000a_reset(void)

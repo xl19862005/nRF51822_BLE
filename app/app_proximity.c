@@ -66,11 +66,14 @@ static void proximity_on_off(ble_proximity_t on_off)
 	
 	if(on_off == BLE_PROXIMITY_ON)
 	{
-		hs3000a_reset();
-		if(hs3000a_init())
+		if(twi_master_init()) 
 		{
-			err_code = proximity_interrupt_init();
-			APP_ERROR_CHECK(err_code);
+			hs3000a_reset();
+			if(hs3000a_init())
+			{ 
+				err_code = proximity_interrupt_init();
+				APP_ERROR_CHECK(err_code);
+			}
 		}
 	}
 	else

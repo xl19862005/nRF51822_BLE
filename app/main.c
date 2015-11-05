@@ -22,9 +22,9 @@
  */
 
 #include "app_board.h"
+#include "app_proximity.h"
 
 #define DEAD_BEEF                       0xDEADBEEF                                  /**< Value used as error code on stack dump, can be used to identify stack location on stack unwind. */
-
 /**@brief Function for assert macro callback.
  *
  * @details This function will be called in case of an assert in the SoftDevice.
@@ -66,7 +66,7 @@ int main(void)
 
     //client_handling_init();
 	    
-    //printf("Starting...\n");
+    //printf("Starting...\n");  
     
     // Enter main loop.
     for (;;)
